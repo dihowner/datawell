@@ -29,7 +29,7 @@
         </div>
     </div>
     <aside class="app-sidebar app-sidebar3">
-        <div class="app-sidebar__user">
+        {{-- <div class="app-sidebar__user">
             <div class="dropdown user-pro-body text-center">
                 <div class="user-pic">
                     <img src="{{ asset('assets/images/users/user-avatar.png') }}" alt="user-img" class="avatar-xl rounded-circle mb-1">
@@ -39,7 +39,7 @@
                     <strong class="d-block text-danger fs-14">{{ $adminUser->roles->role_type }}</strong>
                 </div>
             </div>
-        </div>
+        </div> --}}
     
         <ul class="side-menu">
     

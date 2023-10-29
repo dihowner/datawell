@@ -37,7 +37,7 @@
                     class="w-full flex flex-col items-center max-w-sm mt-5 space-y-5 sm:space-y-7 md:space-y-8 lg:space-y-10 md:mt-8 lg:mt-10 col-center"
                     method="post">
                     @csrf
-                    
+
                     @if ($errors->any() || session()->has('error'))
                         <div class="alert alert-danger" style="font-size: 18px">
                             <ul>
@@ -55,8 +55,7 @@
                         <label class="fw-bold fs-lg-5 my-2 text-secondary" data-shrink="false" for=":rm:"
                             id=":rm:-label">Username or Email Address</label>
                         <div class="w-100">
-                            <span class="invalid-feedback">Please provide a valid email address</span>
-                            <input aria-invalid="false" id=":rm:" type="text" placeholder="Email"
+                            <input aria-invalid="false" id=":rm:" type="text" placeholder="Username OR Email Address"
                                 class="bg-gray-100 form-control fs-5 w-100 px-2 py-2 border border-black focus:outline-none focus:border-blue-500 focus:border-b userdetail"
                                 value="" name="user_detail" />
                         </div>
@@ -65,20 +64,16 @@
                         <label class="fw-bold fs-lg-5 my-2 text-secondary" data-shrink="false" for=":rn:"
                             id=":rn:-label">Password</label>
                         <div class="w-100">
-                            <span class="invalid-feedback">Incorrect password</span>
                             <input aria-invalid="false" type="password" name="password"
                                 placeholder="Enter your password"
                                 class="bg-gray-100 fs-5 form-control w-100 px-2 py-2 placeholder:text-sm rounded-2xl border border-black focus:outline-none focus:border-blue-500 focus:border-b password" />
-                            <!--<span class="">-->
-                            <!--    View-->
-                            <!--</span>-->
                         </div>
                     </div>
-                    <a href="{{ route('forgot-password-form') }}"
-                        class="flex text-sm text-gray-700 normal-case css-1ujsas3">
+                    <a href="{{ route('forgot-password-form') }}" style="font-size: 18px"
+                        class="flex text-gray-700 normal-case css-1ujsas3">
                         Forgot your password?<span class="MuiTouchRipple-root css-w0pj6f"></span></a>
                     <button
-                        class="px-8 py-2 mt-8 text-sm font-bold text-white rounded-full lg:mt-12 lg:py-4 border lg:text-base lg:px-20 bg-[#D10A22] hover:bg-white transition-all duration-500 delay-300 hover:text-[#D10A22] css-1eqycna loginMember"
+                        class="px-8 py-2 mt-8 text-sm font-bold text-white rounded-full lg:mt-12 lg:py-4 border lg:text-base lg:px-20 bg-[#D10A22] transition-all duration-500 delay-300 hover:text-[#D10A22] css-1eqycna loginMember"
                         tabindex="0" type="submit">
                         Sign in<span class=""></span>
                     </button>
