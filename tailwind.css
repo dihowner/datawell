@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.slider {
+  display: flex;
+}
+
+.slider > * {
+  width: 100%;
+  flex: 0 0 auto;
+}
+/* 
+@media (min-width: 768px) {
+  .slider > * {
+    width: 50%;
+  }
+}
+
+@media (min-width: 960px) {
+  .slider > * {
+    width: 33.3333%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .slider > * {
+    width: 25%;
+  }
+} */
+
+.a11y-slider-autoplay {
+  background-color: cadetblue;
+  display: none;
+}
