@@ -32,6 +32,13 @@ Route::middleware(['guest'])->group(function() {
         return redirect('login');
     });
     
+    Route::get('/about', function () {
+        return view('about');
+    })->name('about-us');
+    
+    Route::get('/contact', function () {
+        return view('contactus');
+    });    
 
     Route::get('/login', function () {
         return view('login');
@@ -40,6 +47,10 @@ Route::middleware(['guest'])->group(function() {
     Route::get('/create-account', function () {
         return view('register');
     })->name('get.register');
+
+    Route::get('/pricing', function () {
+        return view('pricing');
+    })->name('get.pricing');
 
     Route::get('/forgot-password', function () {
         return view('forgot-password');

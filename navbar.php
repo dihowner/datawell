@@ -19,7 +19,7 @@
               class="hidden flex flex-col mx-auto items-center absolute z-10 bg-white h-screen mt-24 w-screen animate__animated animate__fadeInLeft">
               <li
                 class="before:w-full text-neutral-700 hover:text-black before:bg-neutral-700 py-6 font-bold tracking-wide before:transition-all hover:transition-all transition-all before:absolute relative before:bottom-4 before:rounded-full before:h-1 before:hover:w-1/2">
-                <a href="home">Home</a>
+                <a href="/">Home</a>
               </li>
               <li
                 class="false text-neutral-700 hover:text-black before:bg-neutral-700 py-6 font-bold tracking-wide before:transition-all hover:transition-all transition-all before:absolute relative before:bottom-4 before:rounded-full before:h-1 before:hover:w-1/2">
@@ -35,7 +35,7 @@
               </li>
               <li
                 class="false text-neutral-700 hover:text-black before:bg-neutral-700 py-6 font-bold tracking-wide before:transition-all hover:transition-all transition-all before:absolute relative before:bottom-4 before:rounded-full before:h-1 before:hover:w-1/2">
-                <a href="blog/blog">Blog</a>
+                <a href="http://blog.datawellng.com" target="_blank">Blog</a>
               </li>
             </ul>
           </div>
@@ -54,7 +54,7 @@
         </a>
 
         <!-- DataWell Logo on small screens -->
-        <a href="home">
+        <a href="/">
           <img alt="The Data Well Logo" loading="lazy" width="1288" height="1288" decoding="async" data-nimg="1"
             class="w-16 lg:hidden mr-4" src="images/The Data Well logo oppo.png" />
         </a>
@@ -68,7 +68,7 @@
         <ul class="space-x-8 flex mx-auto px-20 text-white">
           <li
             class="before:w-full ml-20 text-neutral-50 hover:text-white before:bg-white py-6 font-bold tracking-wide before:transition-all hover:transition-all transition-all before:absolute relative before:bottom-4 before:rounded-full before:h-1 before:hover:w-1/2">
-            <a href="home">Home</a>
+            <a href="/">Home</a>
           </li>
           <li
             class="false text-neutral-50 hover:text-white before:bg-white py-6 font-bold tracking-wide before:transition-all hover:transition-all transition-all before:absolute relative before:bottom-4 before:rounded-full before:h-1 before:hover:w-1/2">
@@ -88,7 +88,7 @@
           </li>
           <li
             class="false text-neutral-50 hover:text-white before:bg-white py-6 font-bold tracking-wide before:transition-all hover:transition-all transition-all before:absolute relative before:bottom-4 before:rounded-full before:h-1 before:hover:w-1/2">
-            <a href="blog/blog">Blog</a>
+            <a href="http://blog.datawellng.com/" target="_blank">Blog</a>
           </li>
 
           <li class="relative px-16 py-6 space-x-2 font-bold tracking-wide cursor-pointer loginLi center">
@@ -115,7 +115,7 @@
         </ul>
       </div>
     </nav>
-    <a href="home" class="absolute z-50 w-16 lg:w-24 xl:w-32 right-10 top-2 lg:top-8">
+    <a href="/" class="absolute z-50 w-16 lg:w-24 xl:w-32 right-10 top-2 lg:top-8">
       <img src="images/The Data Well logo oppo.png" alt="The Data Well Logo" loading="lazy" decoding="async"
         data-nimg="1" class="w-full h-auto lg:block hidden animate__animated animate__fadeInDown"
         style="color: transparent" />

@@ -18,10 +18,7 @@
       <?php include_once "navbar.php"; ?>
 
     <main id="main" class="hide-on-mobile-nav">
-      <section
-        id="price-intro"
-        class="flex mx-auto px-4 md:px-0 justify-center bg-gray-100 h-60 lg:h-96"
-      >
+      <section id="price-intro" class="flex mx-auto px-4 md:px-0 justify-center bg-gray-100 h-60 lg:h-96">
         <div class="h-full flex flex-col justify-center items-center">
           <div class="space-y-2 text-center lg:space-y-4 w-fit col-center">
             <h2

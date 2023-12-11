@@ -449,7 +449,7 @@
         </div>
 
         <div class="mt-20 text-center" data-aos="fade-up" data-aos-once="true" data-aos-duration="1000">
-          <a href="blog" class="flex items-center justify-center">
+          <a href="http://blog.datawellng.com/" target="_blank" class="flex items-center justify-center">
             <button
               class="flex items-center px-4 text-sm normal-case md:px-6 lg:px-8 md:text-base text-[#D10A22] border-[#D10A22] border-2 rounded-md hover:border-transparent hover:bg-[#D10A22] hover:text-white space-x-2 space-y-8"
               tabindex="0" type="button">
@@ -526,8 +526,8 @@
           © 2023 DataWell. All Rights Reserved.
         </p>
         <div class="lg:ml-8 text-xs text-center sm:text-sm md:text-base xl:text-xl">
-          <a class="hover:underline" href="index">Terms &amp; Conditions</a>
-          <a class="hover:underline" href="index">Privacy Policy</a>
+          <a class="hover:underline" href="about">About Us</a> &nbsp;
+          <a class="hover:underline" href="about#services">Our Services</a>
         </div>
       </div>
       <div class="flex justify-center order-first space-x-8 text-zinc-600 lg:justify-between lg:order-last">
