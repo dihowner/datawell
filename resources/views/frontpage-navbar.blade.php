@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="stylesheet" href="//unpkg.com/a11y-slider@latest/dist/a11y-slider.css" />
     <script src="{{ asset('node_modules/a11y-slider/dist/a11y-slider.js') }}"></script>
-    <title>Home | The Data Well Nigeria</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="images/dwell-icon.png">
+    <title>The Data Well Nigeria</title>
 </head>
 
 <body>

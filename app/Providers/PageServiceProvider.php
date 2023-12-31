@@ -29,8 +29,8 @@ class PageServiceProvider extends ServiceProvider
 
         // Get folder name...
         $path = parse_url($url, PHP_URL_PATH);
-        $folder = pathinfo($path, PATHINFO_DIRNAME);
-        $folderName = basename($folder);
+
+        $pageUrl = $path == "" ? "login" : $pageUrl;
 
         if(in_array($path, ["main", "admin"])) {
             $accessType = "admin_page";
@@ -41,12 +41,13 @@ class PageServiceProvider extends ServiceProvider
         }    
         
         $getPage = $pageService->getPage($pageUrl, $accessType);
-        $pageTitle = $getPage === NULL ? "" : $getPage->title;
-        View::share('pageTitle', $pageTitle);
 
-        View::composer('*', function ($view) {
+        $pageTitle = $getPage === NULL ? "" : $getPage->title;
+        View::share("pageTitle", $pageTitle);
+
+        View::composer("*", function ($view) {
             $pageService = new PageService();
-            $view->with('allPageService', $pageService);
+            $view->with("allPageService", $pageService);
         });
     }
 

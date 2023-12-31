@@ -27,7 +27,7 @@ class UserController extends Controller
 
         if($userDetail['secret_pin'] === "0000") {
             // So user will have a clue of what happen, let's sent a toast notification...
-            Alert::info("Error", "To enjoy our numerous offer, kindly change your default transaction pin");
+            Alert::info("Create Your PIN", "To enjoy our numerous offer, kindly change your default transaction pin");
             return redirect()->route('user.pin-password-view');
         }
         return view('private.dashboard', compact('userDetail'));

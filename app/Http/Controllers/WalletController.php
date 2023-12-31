@@ -7,11 +7,12 @@ use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\WalletService;
 use App\Services\PaystackService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Http\Requests\TransferFundRequest;
 use App\Http\Requests\ManualFundingRequest;
-use App\Http\Requests\WalletRequest;
+use App\Services\MonnifyService;
 
 class WalletController extends Controller
 {
@@ -148,5 +149,15 @@ class WalletController extends Controller
             Alert::error("Error", $decodeResponse['message']);
         }
         return redirect()->back();
+    }
+
+    public function approveMonnifyPayment(Request $request) {
+        $monnifyData = json_encode($request->all());
+        Log::channel('daily')->info($monnifyData);
+
+        // $monnifyData = '{"transactionReference":"MNFY|52|20231231115904|002209","paymentReference":"MNFY|52|20231231115904|002209","amountPaid":"250.00","totalPayable":"250.00","settlementAmount":"240.00","paidOn":"31\/12\/2023 11:59:04 AM","paymentStatus":"PAID","paymentDescription":"dih","transactionHash":"1d075b9e103e7b2f8e53cef7cc945d131b85f1964d7cbb147a56becc257be529b0e5fbe727a325594906cbb321f157e4fd6efe1515498749f8bda2d2a448cb89","currency":"NGN","paymentMethod":"ACCOUNT_TRANSFER","product":{"type":"RESERVED_ACCOUNT","reference":"202312311050697"},"accountDetails":{"accountName":"Monnify Limited","accountNumber":"******2190","bankCode":"001","amountPaid":"250.00","sessionId":"6G8t4MsW1j7dYBTyIlqwjo2AsrAWc8Ey","destinationAccountNumber":"6000195164","destinationBankCode":"232","destinationBankName":"Sterling bank"},"accountPayments":[{"accountName":"Monnify Limited","accountNumber":"******2190","bankCode":"001","amountPaid":"250.00","sessionId":"6G8t4MsW1j7dYBTyIlqwjo2AsrAWc8Ey","destinationAccountNumber":"6000195164","destinationBankCode":"232","destinationBankName":"Sterling bank"}],"customer":{"email":"oluwatayoadeyemi@yahoo.com","name":"Oluwatayo Adeyemi"}}';
+        $approvePayment = app(MonnifyService::class)->approveMonnifyPayment($monnifyData);
+
+        return $approvePayment;
     }
 }

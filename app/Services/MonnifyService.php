@@ -1,9 +1,11 @@
 <?php
 namespace App\Services;
 
-use App\Classes\HttpRequest;
 use Exception;
+use App\Models\User;
+use App\Models\WalletIn;
 use App\Models\VirtualBank;
+use App\Classes\HttpRequest;
 use App\Http\Traits\ResponseTrait;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
@@ -15,7 +17,7 @@ class MonnifyService extends UserService {
 
     private $v1 = "/api/v1/";
     private $v2 = "/api/v2/";
-    private $monnifyInfo, $endpoint, $apiKey, $secKey, $contractCode, $charges, $chargestype;
+    private $monnifyInfo, $endpoint, $apiKey, $secKey, $contractCode, $charges, $chargestype, $percent, $deposit_amount;
 
     public function __construct(UtilityService $utilityService)
     {
@@ -27,6 +29,8 @@ class MonnifyService extends UserService {
         $this->contractCode = $this->monnifyInfo->contractCode;
         $this->charges = (float) $this->monnifyInfo->charges;
         $this->chargestype = $this->monnifyInfo->chargestype;
+        $this->percent = $this->monnifyInfo->percent;
+        $this->deposit_amount = $this->monnifyInfo->deposit_amount;
     }
 
     public function getAllVirtualBanks() {
@@ -148,6 +152,107 @@ class MonnifyService extends UserService {
             $this->responseBody = ["message" => $e->getMessage()];
         }
         return $this->responseBody;
+    }
+
+    public function approveMonnifyPayment($paymentData) {
+        try {
+            $decode_result = json_decode($paymentData, true);
+            $monnifyInfo = $this->utilityService->monnifyInfo();
+            $decodeMonnify = json_decode($monnifyInfo, true);
+            
+            if(isset($decode_result["eventType"]) == "SUCCESSFUL_TRANSACTION" OR isset($decode_result["transactionReference"]) != NULL) {
+                
+                if(isset($decode_result["eventType"])) {
+                    $result = $decode_result['eventData'];
+                } else {
+                    $result = $decode_result;
+                }
+
+                $hash = hash("SHA512" ,str_replace(" ", "", $this->secKey)."|".$result['paymentReference']."|".$result['amountPaid']."|".$result['paidOn']."|".$result['transactionReference']);
+
+                $paymentReference = $result["paymentReference"];
+
+                $isExistPayment = WalletIn::where(['reference' => $paymentReference])->first();
+                
+                if ($isExistPayment) {
+                    return $this->sendError("Payment already approved", [], 400);
+                } else {
+                    $data = http_build_query([ "paymentReference" =>$paymentReference ]);
+
+                    $verifyPayment = HttpRequest::sendGet($decodeMonnify['baseUrl']."/api/v1/merchant/transactions/query", $data, [
+                        "Authorization" => "Basic ".base64_encode($this->apiKey.':'.$this->secKey),
+                        "Content-Type" => "application/json"
+                    ]);
+                    $decodeverifyPayment = json_decode($verifyPayment);
+                    if ($decodeverifyPayment->responseBody->paymentStatus =="PAID") {
+                        if ($result["product"]["type"] == "RESERVED_ACCOUNT") { //if reserved/mapped account
+                            
+                            $userReference = $result["product"]["reference"]; // Monnify account reference
+
+                            $getClient = User::where(['auto_funding_reference' => $userReference])->first();
+                            $userId = $getClient['id']; //Client Id
+                            $currBlc = app(WalletService::class)->getUserBalance($userId); //what's the current balance of the member making payment...
+                            $amountPaid = (double) $result["amountPaid"]; // how much was paid to monnify without settlement amount.... 
+
+                            if($this->chargestype == "flat_rate") {
+                                $amount_crdt = (float) ($amountPaid - $this->charges);
+                            }
+                            else if($this->chargestype == "percentage") {
+                                $amount_crdt = (float) ($amountPaid - (($amountPaid * $this->percent)/100));
+                            }
+                            else {
+                                if($amountPaid >= $this->deposit_amount) {
+                                    $amount_left = ($amountPaid - (($amountPaid * $this->percent)/100));
+                                    $amount_crdt = (float) ($amount_left - $this->charges);
+                                }
+                                else {
+                                    $amount_crdt = (float) ($amountPaid - $this->charges);
+                                }
+                            }
+
+                            $newBlc = (float) ($currBlc + $amount_crdt);
+
+                            $result['approved_by'] = 'Monnify System';
+
+                            $walletData = [
+                                'user_id' => $userId,
+                                'description' => 'Monnify Wallet funding of '.$amount_crdt,
+                                'old_balance' => $currBlc,
+                                'amount' => $amount_crdt,
+                                'new_balance' => $newBlc,
+                                'reference' => $paymentReference,
+                                'status' => '1',
+                                'channel' => 'monnify',
+                                'wallet_type' => 'wallet_in',
+                                'remark' => json_encode($result)
+                            ];
+
+                            $createWallet = app(WalletService::class)->createWallet('inward', $walletData);
+
+                            if ($createWallet) {
+                                $data = [
+                                    'user_reference' => $userReference,
+                                    'amount' => $amount_crdt,
+                                    'amount_paid' => $amountPaid,
+                                    'payment_reference' => $paymentReference
+                                ];
+                                
+                                return $this->sendResponse("Payment approved successfully", $data);
+                            }
+                            return $this->sendError("Error updating user wallet balance", [], 400);
+                        }
+                        return $this->sendError("Payment data is not with a reserved account", [], 400);
+                    }
+                    return $this->sendError("Payment is in pending state with Provider", [], 400);
+                }
+            }
+            else {
+                return $this->sendError("Not a successful transaction", [], 400);
+            }
+        }
+        catch(Exception $e) {
+            return $this->sendError("Error!. ".$e->getMessage(), [], 500);
+        }
     }
 
 }

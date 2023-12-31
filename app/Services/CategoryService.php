@@ -85,10 +85,14 @@ class CategoryService  {
             if($categoryId == NULL) {
                 $product_name = $categoryValue['category_name']; //Because we hard-coded the list..
                 $product = $this->productService->getProductWithCategoryId_ProductName("", $product_name);
-                $mergeCategories[$categoryIndex]["current_api_id"] = $product["api_id"];
             } else {
                 $product = $this->productService->getProductWithCategoryId_ProductName($categoryId);
+            }
+
+            if ($product != NULL) {
                 $mergeCategories[$categoryIndex]["current_api_id"] = $product["api_id"];
+            } else {
+                $mergeCategories[$categoryIndex]["current_api_id"] = 0;
             }
         }
         

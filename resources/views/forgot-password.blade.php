@@ -65,7 +65,7 @@
                                 </div>
                                 <div class="text-center pt-4">
                                     <div class="font-weight-normal fs-16">Already have an account ?
-                                        <a class="btn-link font-weight-normal" href="{{ url('/') }}">Login Here</a>
+                                        <a class="btn-link font-weight-normal" href="{{ route('get.login') }}">Login Here</a>
                                     </div>
                                 </div>
                             </div>

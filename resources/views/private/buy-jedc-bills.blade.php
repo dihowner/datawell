@@ -60,7 +60,7 @@
                                                             $totalPrice = $pricing['extra_charges'];
                                                         @endphp
                                                         <option value="{{ $jedcProduct['product_id'] }}"
-                                                            data-price="{{ $totalPrice }}"
+                                                            data-name="{{ $jedcProduct['product_name'] }}" data-price="{{ $totalPrice }}"
                                                             @if ($jedcProduct['availability'] == '0') disabled @endif>
                                                             {{ $jedcProduct['product_name'] }}
                                                         </option>

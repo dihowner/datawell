@@ -3,13 +3,13 @@
     $userMeta = $userDetail->user_meta;
     $bankingInformation = $UtilityService::bankInformation();
     $bankAccountInformation = isset($bankingInformation['account_information']) ? $bankingInformation['account_information'] : null;
-    
+
     // Bank charges condition...
     $stampDutyInformation = isset($bankingInformation['bank_charges']) ? json_decode($bankingInformation['bank_charges'], true) : null;
     $stampDutyCharge = $stampDutyInformation != null ? $stampDutyInformation['stamp_duty_charge'] : 0;
     $minFundingAmount = $stampDutyInformation != null ? $stampDutyInformation['min_wallet'] : 0;
     $minStampAmount = $stampDutyInformation != null ? $stampDutyInformation['min_stamp'] : 0;
-    
+
     $flutterwaveSetting = $UtilityService::flutterwaveInfo() === false ? false : $UtilityService::flutterwaveInfo();
     if ($flutterwaveSetting !== false) {
         $flutterwaveSetting = json_decode($flutterwaveSetting, true);
@@ -17,7 +17,7 @@
         $flutterPublicKey = $flutterwaveSetting['public_key'];
         $flutterSecretKey = $flutterwaveSetting['secret_key'];
     }
-    
+
     $paystackSetting = $UtilityService::paystackInfo() === false ? false : $UtilityService::paystackInfo();
     if ($paystackSetting !== false) {
         $paystackSetting = json_decode($paystackSetting, true);
@@ -83,7 +83,7 @@
                                                 <select class="form-control form-control-lg mb-4 funding_method"
                                                     name="funding_method">
                                                     <option value="">-- Select Method --</option>
-                                                    <option value="manual_funding">Manual Method</option>
+                                                    <option value="manual_funding">Bank Deposit (Transfer)</option>
                                                     @if ($isflutterActive === 'active')
                                                         <option value="flutterwave">Flutterwave Online Payment</option>
                                                     @endif
@@ -92,7 +92,8 @@
                                                         <option value="paystack">Paystack Online Payment</option>
                                                     @endif
 
-                                                    <option value="instant_funding">Instant Funding</option>
+                                                    <option value="instant_funding">Instant Funding (Recommended)
+                                                    </option>
                                                 </select>
                                             </div>
                                         </div>
@@ -103,16 +104,17 @@
                                                     <b style="color: red">NOTE: </b>All payment are to be made to the
                                                     following account details below
                                                     <span class="d-block">{!! nl2br($bankAccountInformation) !!}</span>
-                                                </div>
-                                            </div>
 
-                                            <div class="col-md-12 fs-20">
-                                                <strong class="text-danger">Please Note; </strong>
-                                                Maximum wallet funding through Bank Deposit or Transfer is
-                                                <span
-                                                    class='text-danger'>{{ $UtilityService::CURRENCY }}{{ number_format($minStampAmount, 2) }}</span>
-                                                which attract a funding charge of
-                                                {{ $UtilityService::CURRENCY }}{{ number_format($stampDutyCharge) }}
+                                                    <div class="displayNotifyStampDuty d-none">
+                                                        <br>
+                                                        <strong class="text-danger">Please Note; </strong>
+                                                        Funding through Bank Deposit or Transfer from
+                                                        <span
+                                                            class='text-danger'>{{ $UtilityService::CURRENCY }}{{ number_format($minStampAmount, 2) }}</span>
+                                                        attract a funding charge of
+                                                        {{ $UtilityService::CURRENCY }}{{ number_format($stampDutyCharge) }}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -138,6 +140,16 @@
                 $(".bank-details").removeClass("d-none");
             } else {
                 $(".bank-details").addClass("d-none");
+            }
+        });
+
+        $("input[name='amount']").on("keyup keypress keydown", function() {
+            let newAmount = parseFloat($(this).val());
+            let minStampAmount = parseFloat({{ $minStampAmount }})
+            if (newAmount >= minStampAmount) {
+                $(".displayNotifyStampDuty").removeClass('d-none')
+            } else {
+                $(".displayNotifyStampDuty").addClass('d-none')
             }
         });
     </script>

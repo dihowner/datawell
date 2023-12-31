@@ -132,14 +132,22 @@ class PlanService {
 
     public function getPlanProducts($planId) {
         $products = ProductPricing::with('product.category')->where('plan_id', $planId)->get();
-
+    
         // Map product image to the result set...
-        $products->map(function ($product) {
-            $product->image_url = $this->utilityService->getProductImage($product->product->product_name);
+        $products->transform(function ($product) {
+            $productName = isset($product->product->product_name) ? $product->product->product_name : null;
+            $product->image_url = $productName ? $this->utilityService->getProductImage($productName) : null;
+    
             return $product;
         });
-
+    
+        // Filter out null products
+        $products = $products->filter(function ($product) {
+            return !is_null($product->image_url);
+        });
+    
         return $products;
     }
+    
 
 }

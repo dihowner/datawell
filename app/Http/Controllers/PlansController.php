@@ -100,6 +100,7 @@ class PlansController extends Controller
     
     public function getPlanProducts($planId) {
         $planProducts = $this->planService->getPlanProducts($planId);
+        // return $planProducts;
         return view('main.sellingprice', compact("planProducts"));
     }
 

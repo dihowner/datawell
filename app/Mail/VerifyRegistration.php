@@ -8,22 +8,22 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ForgotPassword extends Mailable
+class VerifyRegistration extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user, $resetToken;
-
+    public $user, $verifyCode;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($user, $token)
+    public function __construct($user, $code)
     {
         $this->user = $user;
-        $this->resetToken = $token;
+        $this->verifyCode = $code;
     }
 
     /**
@@ -34,8 +34,8 @@ class ForgotPassword extends Mailable
     public function envelope()
     {
         return new Envelope(
-            from: new Address('no-reply@datawellng.com', 'Reset Password Request'),
-            subject: 'Reset Your Password',
+            from: new Address('no-reply@datawellng.com', 'Complete your registration'),
+            subject: 'Complete your registration',
         );
     }
 
@@ -47,8 +47,8 @@ class ForgotPassword extends Mailable
     public function content()
     {
         return new Content(
-            html: 'emails.forgotPass',
-            text: 'emails.forgotPass',
+            html: 'emails.verifyRegistration',
+            text: 'emails.verifyRegistration',
         );
     }
 
@@ -64,6 +64,6 @@ class ForgotPassword extends Mailable
 
     public function build()
     {
-        return $this->subject('Reset Your Password')->markdown('emails.forgotPass');
+        return $this->subject('Complete your registration')->markdown('emails.verifyRegistration');
     }
 }

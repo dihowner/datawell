@@ -60,7 +60,7 @@
                                                             $totalPrice = $pricing['extra_charges'];
                                                         @endphp
                                                         <option value="{{ $ikedcProduct['product_id'] }}"
-                                                            data-price="{{ $totalPrice }}"
+                                                            data-name="{{ $ikedcProduct['product_name'] }}" data-price="{{ $totalPrice }}"
                                                             @if ($ikedcProduct['availability'] == '0') disabled @endif>
                                                             {{ $ikedcProduct['product_name'] }}
                                                         </option>

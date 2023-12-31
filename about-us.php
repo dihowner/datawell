@@ -9,9 +9,9 @@
   <link rel="stylesheet" href="node_modules/a11y-slider/dist/a11y-slider.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <link rel="stylesheet" href="//unpkg.com/a11y-slider@latest/dist/a11y-slider.css" />
-  <link rel="icon" type="image/png" sizes="32x32" href="images/dwell-icon.png">
   <script src="node_modules/a11y-slider/dist/a11y-slider.js"></script>
-  <title>Home | The Data Well Nigeria</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="images/dwell-icon.png">
+  <title>About Us | The Data Well Nigeria</title>
 </head>
 
 <body>
@@ -236,50 +236,6 @@
 
         <div
           class="grid mt-6 sm:grid-cols-2 lg:grid-cols-3 sm:mt-10 md:mt-14 lg:mt-20 sm:gap-x-10 md:gap-x-14 lg:gap-x-14 xl:gap-x-16 2xl:gap-x-20 gap-y-6 sm:gap-y-10 md:gap-y-14 lg:gap-y-28 auto-rows-auto">
-          
-         <?php 
-         $blogData = fetchBlog("https://blog.datawellng.com/api/index.php");
-          if ($blogData != 'error') {
-              $blogData = json_decode((string) $blogData, true);
-              foreach ($blogData as $blogIndex => $blogInfo) {
-                  ?>
-                        <a href="<?php echo $blogInfo['url'] ;?>" target="_blank">
-                          <div data-aos="fade-up" data-aos-once="true" data-aos-duration="1000" class="h-full">
-                            <div class="md:flex-none h-full overflow-hidden transition-shadow bg-gray-200 rounded-md hover:shadow-md">
-                              <img alt="<?php echo $blogInfo['title'] ;?>" loading="lazy" width="150"
-                                height="150" decoding="async" data-nimg="1"
-                                class="w-full h-40 object-cover object-center md:w-full sm:h-48"
-                                src="<?php echo $blogInfo['attachment'] ;?>" />
-
-                              <div
-                                class="w-full h-[calc(100%-160px)] md:w-full px-4 py-6 xl:py-8 space-y-1.5 md:space-y-3 col-between sm:h-[calc(100%-192px)] order-first md:order-last">
-                                <h4 class="text-base font-bold text-gray-800 md:text-lg">
-                                  <?php echo $blogInfo['title'] ;?>
-                                </h4>
-
-                                <div class="space-x-4 start flex">
-                                  <h4 class="text-xs font-medium flex text-gray-600 md:text-sm">
-                                    <svg width="18px" height="18px" class="text-base mr-2 fill-current text-gray-500"
-                                      focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="AccessTimeIcon">
-                                      <path
-                                        d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z">
-                                      </path>
-                                      <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"></path>
-                                    </svg>
-                                    <?php echo timeElapsedString($blogInfo['post_date']) ;?>
-                                  </h4>
-                                  
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
-                  <?php
-              }
-          }
-         
-         ?>
-  <!--
           <a href="blog/Cheaper_Data_Bundle_now_available_for_University_Students">
             <div data-aos="fade-up" data-aos-once="true" data-aos-duration="1000" class="h-full">
               <div class="md:flex-none h-full overflow-hidden transition-shadow bg-gray-200 rounded-md hover:shadow-md">
@@ -491,11 +447,10 @@
               </div>
             </div>
           </a>
-        -->
         </div>
 
         <div class="mt-20 text-center" data-aos="fade-up" data-aos-once="true" data-aos-duration="1000">
-          <a href="http://blog.datawellng.com/" target="_blank" class="flex items-center justify-center">
+          <a href="blog" class="flex items-center justify-center">
             <button
               class="flex items-center px-4 text-sm normal-case md:px-6 lg:px-8 md:text-base text-[#D10A22] border-[#D10A22] border-2 rounded-md hover:border-transparent hover:bg-[#D10A22] hover:text-white space-x-2 space-y-8"
               tabindex="0" type="button">
@@ -572,8 +527,8 @@
           © 2023 DataWell. All Rights Reserved.
         </p>
         <div class="lg:ml-8 text-xs text-center sm:text-sm md:text-base xl:text-xl">
-          <a class="hover:underline" href="about">About Us</a> &nbsp;
-          <a class="hover:underline" href="about#services">Our Services</a>
+          <a class="hover:underline" href="index">Terms &amp; Conditions</a>
+          <a class="hover:underline" href="index">Privacy Policy</a>
         </div>
       </div>
       <div class="flex justify-center order-first space-x-8 text-zinc-600 lg:justify-between lg:order-last">
@@ -617,60 +572,6 @@
       </div>
     </div>
   </footer>
-
-  <?php
-  function fetchBlog($blogUrl) {
-        $ch = curl_init();
-
-        // Set cURL options
-        curl_setopt($ch, CURLOPT_URL, $blogUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Return the response as a string
-
-        // Execute cURL session and get the response
-        $response = curl_exec($ch);
-
-        // Check for cURL errors
-        if (curl_errno($ch)) {
-            echo 'Curl error: ' . curl_error($ch);
-        }
-
-        // Close cURL session
-        curl_close($ch);
-
-        // Display the response
-        return $response;
-
-    }
-    
-    function timeElapsedString($datetime, $full = false) {
-        $now = new DateTime();
-        $ago = new DateTime($datetime);
-        $diff = $now->diff($ago);
-    
-        $diffString = [
-            'y' => 'year',
-            'm' => 'month',
-            'd' => 'day',
-            'h' => 'hour',
-            'i' => 'minute',
-            's' => 'second',
-        ];
-    
-        foreach ($diffString as $key => &$value) {
-            if ($diff->$key) {
-                $value = $diff->$key . ' ' . ($diff->$key > 1 ? $value . 's' : $value);
-            } else {
-                unset($diffString[$key]);
-            }
-        }
-    
-        if (!$full) {
-            $diffString = array_slice($diffString, 0, 1);
-        }
-    
-        return $diffString ? implode(', ', $diffString) . ' ago' : 'just now';
-    }
-    ?>
 
   <script src="home.js"></script>
   <script src="//unpkg.com/a11y-slider@latest/dist/a11y-slider.js"></script>

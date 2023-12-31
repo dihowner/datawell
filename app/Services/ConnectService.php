@@ -31,8 +31,8 @@ class ConnectService  {
                 "screen_url" => $appUrl."connection/$serverId/screen.php",
                 "report_url" => $appUrl."connection/$serverId/report.php",
                 "server_id" => $serverId,
-                "calling_time" => (int) $fetchServer->calling_time,
-                "color" => (int) $fetchServer->app_color_scheme,
+                "calling_time" => (string) $fetchServer->calling_time,
+                "color" => (string) $fetchServer->app_color_scheme,
                 "auth_code" => $fetchServer->auth_code
             ];
         }

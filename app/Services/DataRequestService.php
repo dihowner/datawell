@@ -55,6 +55,8 @@ class DataRequestService {
         try {
             $product_id = $requestData['product_id'];
             $mobilenig = isset($requestData['mobilenig']) ? $requestData['mobilenig'] : NULL;
+            $init_code = isset($requestData['init_code']) ? $requestData['init_code'] : NULL;
+            $wrap_code = isset($requestData['wrap_code']) ? $requestData['wrap_code'] : NULL;
             
             $checkRequest = DataRequest::where("product_id", $product_id)->first();
 
@@ -62,7 +64,8 @@ class DataRequestService {
                 return $this->sendError("Data Bundle request code already exist", [], 400);
             }
             DataRequest::create([
-                "product_id" => $product_id, "mobilenig" => $mobilenig
+                "product_id" => $product_id, "init_code" => $init_code, 
+                "wrap_code" => $wrap_code, "mobilenig" => $mobilenig
             ]);
             return $this->sendResponse("Data Bundle request added successfully", [], 200);
         }
@@ -76,6 +79,8 @@ class DataRequestService {
         try {
             $requestId = $requestData['id'];
             $mobilenig = isset($requestData['mobilenig']) ? $requestData['mobilenig'] : NULL;
+            $init_code = isset($requestData['init_code']) ? $requestData['init_code'] : NULL;
+            $wrap_code = isset($requestData['wrap_code']) ? $requestData['wrap_code'] : NULL;
             
             $checkRequest = DataRequest::where("id", $requestId)->first();
 
@@ -84,6 +89,8 @@ class DataRequestService {
             }
             
             DataRequest::where('id', $requestId)->update([
+                "init_code" => $init_code, 
+                "wrap_code" => $wrap_code,
                 "mobilenig" => $mobilenig
             ]);
             return $this->sendResponse("Data Bundle request updated successfully", [], 200);

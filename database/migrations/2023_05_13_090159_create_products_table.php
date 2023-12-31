@@ -22,7 +22,7 @@ return new class extends Migration
             $table->enum('availability', ['0', '1', '2'])->unsigned()->default('1');
             $table->unsignedBigInteger('api_id');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->foreign('api_id')->references('id')->on('apis');
+            $table->foreign('api_id')->references('id')->on('apis')->onDelete('cascade');
         });
     }
 

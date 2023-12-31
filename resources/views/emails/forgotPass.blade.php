@@ -8,7 +8,7 @@
                     <p style="margin: 0;">
                         Hi {{ ucwords($user->fullname) }},
                         <br/><br/>
-                        Looks like you'd like to change your {{ config('app.name') }} password. Please click the following button to do so.
+                        Looks like you'd like to change your {{ config('app.name') }} password. Please click the button to do so.
                         <br/><br/>
                         Please disregard this e-mail if you did not request a password reset.
                         

@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use App\Mail\ForgotPassword;
 use App\Models\PasswordReset;
 use App\Http\Traits\ResponseTrait;
+use App\Mail\VerifyRegistration as MailVerifyRegistration;
+use App\Models\VerifyRegistration;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -73,6 +75,24 @@ class AuthService  {
             "expires_on" => $expiresOn,
         ]);        
     }
+
+    public function verifyUserAccount($verifyCode) {
+        try {
+            $isExisting = VerifyRegistration::where(['code' => $verifyCode, 'status' => 'new'])->first();
+            if ($isExisting) {
+                $userId = $isExisting['user_id'];
+                User::where(['id' => $userId])->update(['is_verified' => '1']);
+                VerifyRegistration::where(['code' => $verifyCode, 'status' => 'new'])->update(['status' => 'used']);
+                Auth::loginUsingId($userId, true);
+                return $this->sendResponse("Account verified successfully", Auth::user(), 200);
+            }
+            return $this->sendError("Invalid verification code supplied", [], 400);
+        }
+        catch(Exception $e) {
+            Log::error($e->getMessage());
+            return $this->sendError("Error creating user account", [], 400);
+        }
+    }
     
     public function createAccount(array $registerData) {
         try {
@@ -84,6 +104,15 @@ class AuthService  {
                 $registerData['password'] = Hash::make($registerData['password']);
                 $registerData['plan_id'] = $default_plan_id;
                 $theUser = User::create($registerData);
+                if($theUser) {
+                    $verifyCode = Str::random(24);
+                    VerifyRegistration::create([
+                        'user_id' => $theUser->id,
+                        'code' => $verifyCode,
+                        'status' => 'new'
+                    ]);
+                    Mail::to($theUser->emailaddress)->send(new MailVerifyRegistration($theUser, $verifyCode));
+                }
                 $this->responseBody = $this->sendResponse("User account created successfully", $theUser);
             }
         }
@@ -105,29 +134,35 @@ class AuthService  {
             ])->first();
 
             if(!$checkUser) {
-                $this->responseBody = $this->sendError("Bad combination of username or password", [], 400);
+                return $this->sendError("Bad combination of username or password", [], 400);
             }
-            else {
-                if(Auth::attempt(['username' => $checkUser->username, 'password' => $loginData['password']])) {
-                    $user = Auth::user();
+            
+            if(Auth::attempt(['username' => $checkUser->username, 'password' => $loginData['password']])) {
+                $user = Auth::user();
+
+                if($user->is_verified == '0') {
+                    $getVerification = VerifyRegistration::where(['user_id' => $user->id, 'status' => 'new'])->first();
+                    Mail::to($user->emailaddress)->send(new MailVerifyRegistration($user, $getVerification->code));
+                    Auth::logout();
+                    return $this->sendError("Your account is pending activation, kindly check your email inbox or spam folder", [], 400);
+                }
+                else {
                     $userData = [
                         "id" => $user->id,
                         "username" => $user->username,
                         "fullname" => $user->fullname
                     ];
-                    // return redirect()->route("user/dashboard2");
-                    $this->responseBody = $this->sendResponse("Login ssuccessful", $userData);
+                    return $this->sendResponse("Login successful", $userData);
                 }
-                else {
-                    $this->responseBody = $this->sendError("Bad combination of username or password", [], 400);
-                }
+            }
+            else {
+                return $this->sendError("Bad combination of username or password", [], 400);
             }
         }
         catch(Exception $e) {
             Log::error($e->getMessage());
-            $this->responseBody = $this->sendError("Unexpected error occurred", [], 400);
+            return $this->sendError("Unexpected error occurred", [], 400);
         }
-        return $this->responseBody;
     }
 
     /*

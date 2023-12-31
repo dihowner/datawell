@@ -21,6 +21,7 @@ return new class extends Migration
             $table->tinyInteger('plan_id')->default(0);
             $table->string('secret_pin', 25)->default('0000');
             $table->string('auto_funding_reference')->nullable();
+            $table->enum('is_verified', [0, 1])->default('0');
             $table->rememberToken();
             $table->timestamps();
         });

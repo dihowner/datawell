@@ -95,17 +95,16 @@
         <li class="slide mb-2">
             <a class="side-menu__item" data-toggle="slide" href="javascript:void">
                 <i class="fa fa-money"></i>
-                <span class="side-menu__label">Make Money</span><i class="angle fa fa-angle-right"></i>
+                <span class="side-menu__label">Airtime to Cash </span><i class="angle fa fa-angle-right"></i>
             </a>
             <ul class="slide-menu">
                 <li><a class="slide-item" href="{{ route('user.airtime-to-cash') }}"><span>Convert Airtime To
                             Cash</span></a></li>
-                <li><a class="slide-item" href="{{ route('user.bank-withdrawal') }}"><span>Withdraw To Bank</span></a>
-                </li>
+                {{-- <li><a class="slide-item" href="{{ route('user.bank-withdrawal') }}"><span>Withdraw To Bank</span></a></li> --}}
                 <li><a class="slide-item" href="{{ route('user.airtimeconv-history') }}"><span>Airtime Conversion
                             History</span></a></li>
-                <li><a class="slide-item" href="{{ route('user.withdrawals-history') }}"><span>Cash Withdrawal
-                            History</span></a></li>
+                {{-- <li><a class="slide-item" href="{{ route('user.withdrawals-history') }}"><span>Cash Withdrawal
+                            History</span></a></li> --}}
             </ul>
         </li>
 
@@ -177,7 +176,7 @@
                 <div class="m-auto f-18">
                     <a href="{{ route('user.sign-out') }}">
                         <strong class="d-block">
-                            <i class="fa fa-sign-out"></i> {{ ucwords($userDetail->fullname) }}
+                            <i class="fa fa-sign-out"></i> Logout ({{ strtolower($userDetail->username) }})
                         </strong>
                     </a>
                 </div>

@@ -71,6 +71,19 @@ class AuthController extends Controller
         return redirect()->route('forgot-password-form');
     }
 
+    public function verifyUserAccount($code) {
+        $verifyUserAccount = $this->authService->verifyUserAccount($code);
+        $statusCode = $verifyUserAccount->getStatusCode();
+        
+        if($statusCode === 200) {
+            return redirect()->route('user.index');
+        }        
+        
+        $responseContent = json_decode($verifyUserAccount->content());
+        Alert::error("Error", $responseContent->message);
+        return redirect()->route('get.login');
+    }
+
     public function createAccount(RegisterRequest $request) {
         $createRequest = $this->authService->createAccount($request->validated());
         $statusCode = $createRequest->getStatusCode();
@@ -79,12 +92,13 @@ class AuthController extends Controller
         $message = $decodeResponse['message'];
         
         if($statusCode === 200) {
-            Alert::success('Success', $message);
+            Alert::success('Success', 'Your registration was successful. Kindly check your email inbox or spam folder to complete your registration');
+            return redirect()->route('get.login');
         }
         else {
             Alert::error('Error', $message);
+            return redirect()->back();
         }
-        return redirect()->back();
     }
 
     public function loginAccount(LoginRequest $request) {

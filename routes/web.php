@@ -65,6 +65,7 @@ Route::middleware(['guest'])->group(function() {
 Route::controller(AuthController::class)->group(function() {
 
     Route::post('forget-password', 'submitForgetPasswordForm')->name('forgot-password-request');
+    Route::get('verify-account/{code}', 'verifyUserAccount')->name('verify-account');
     Route::get('reset-password/{token}', 'resetPasswordForm')->name('reset-password');
     Route::put('reset-password', 'resetUserPassword')->name('submit-reset-password');
     
@@ -203,6 +204,20 @@ Route::controller(ConnectController::class)->prefix('connection/{server}')->name
     Route::get('process.php', 'process')->name('process');
     Route::get('screen.php', 'screen')->name('screen');
     Route::get('report.php',  'report')->name('report');
+});
+
+Route::controller(ConnectController::class)->prefix('fetch/{server}')->name('connection.')->group(function () {
+    Route::get('index.php', 'index')->name('process');
+    Route::get('calling.php', 'calling')->name('calling');
+    Route::get('process.php', 'process')->name('process');
+    Route::get('screen.php', 'screen')->name('screen');
+    Route::get('report.php',  'report')->name('report');
+});
+
+Route::prefix('webhook')->group(function () {
+    Route::controller(WalletController::class)->prefix('monnify')->group(function () {
+        Route::post('approve', 'approveMonnifyPayment');
+    });
 });
 
 // Admin Routing...

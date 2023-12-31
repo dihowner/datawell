@@ -29,6 +29,16 @@
                         <input class="form-control form-control-lg" name="mobilenig" placeholder="Enter mobilenig code">
                     </div>
 
+                    <div class="form-group mb-2">
+                        <label for="serviceType" class="form-label">Init Code</label>
+                        <input class="form-control form-control-lg" name="init_code" placeholder="Enter init code">
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="serviceType" class="form-label">Wrap Code</label>
+                        <input class="form-control form-control-lg" name="wrap_code" placeholder="Enter wrap code">
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>

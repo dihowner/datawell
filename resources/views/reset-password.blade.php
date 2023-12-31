@@ -47,12 +47,12 @@
 
                                                 <div class="input-group mb-3">
                                                     <input type="password" class="form-control" name="password"
-                                                        placeholder="Enter your password">
+                                                        placeholder="Enter your new password">
                                                 </div>
 
                                                 <div class="input-group mb-3">
                                                     <input type="password" class="form-control" name="confirm_password"
-                                                        placeholder="Confirm your password">
+                                                        placeholder="Confirm your new password">
                                                 </div>
 
                                                 <div class="row">

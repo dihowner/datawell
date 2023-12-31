@@ -339,7 +339,7 @@
                                             <div class="col-md-12 mb-2">
                                                 <label>Minimum Value</label>
                                                 <input class="form-control form-control-lg"
-                                                    placeholder="Enter minimum airtime amount" name="mtn_receiver"
+                                                    placeholder="Enter minimum airtime amount" name="min_value"
                                                     value="{{ $airtimeInfo['min_value'] }}" />
                                             </div>
 

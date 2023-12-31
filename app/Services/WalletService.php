@@ -3,8 +3,10 @@ namespace App\Services;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\WalletIn;
 use App\Models\WalletOut;
+use App\Classes\HttpRequest;
 use App\Services\UserService;
 use App\Classes\PaginatorHelper;
 use App\Http\Traits\ResponseTrait;
@@ -432,5 +434,4 @@ class WalletService {
             return $this->sendError("Error!. ".$e->getMessage(), [], 500);
         }
     }
-    
 }

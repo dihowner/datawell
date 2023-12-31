@@ -70,6 +70,8 @@ class AirtimeDispatcher extends Command
                 
                 $vendorCode = $theProduct->api->vendor->vendor_code;
                 $theProductApi = $theProduct->api;
+                
+                Log::channel('daily')->info($vendorCode);
 
                 if($vendorCode != 'localserver') {
                     $purchaseData = [
@@ -82,6 +84,9 @@ class AirtimeDispatcher extends Command
                         "category" => "airtime",
                         "ignoreCron" => true
                     ];
+                    
+                    Log::channel('daily')->info(self::sendToProvider($purchaseData, $theProductApi));
+
                     self::updateOrder($uniqueReference, self::sendToProvider($purchaseData, $theProductApi));
                 }
             }   

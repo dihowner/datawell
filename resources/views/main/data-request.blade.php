@@ -22,7 +22,7 @@
                                 <div class="card-header d-flex justify-content-between">
 
                                     <div class="mb-0">
-                                        <h3 class="card-title mb-0">cable Tv Requests</h3>
+                                        <h3 class="card-title mb-0">Data Bundle Requests</h3>
                                     </div>
 
                                     <div class="ml-auto mb-0">
@@ -54,6 +54,8 @@
                                                 <tr>
                                                     <th>S/N</th>
                                                     <th>Product</th>
+                                                    <th>Init Code</th>
+                                                    <th>Wrap Code</th>
                                                     <th>MobileNig</th>
                                                     <th></th>
                                                 </tr>
@@ -69,6 +71,8 @@
                                                             $requestId = $dataRequest->id;
                                                             
                                                             $mobileNigCode = $dataRequest->mobilenig;
+                                                            $initCode = $dataRequest->init_code;
+                                                            $wrapCode = $dataRequest->wrap_code;
                                                         @endphp
                                                         <tr>
                                                             <td>{{ $i }}</td>
@@ -84,6 +88,8 @@
                                                                     </div>
                                                                 </div>
                                                             </td>
+                                                            <td>{{ $initCode }} </td>
+                                                            <td>{{ $wrapCode }} </td>
                                                             <td>{{ $mobileNigCode }} </td>
                                                             <td>
 
@@ -127,6 +133,26 @@
                                                                         </div>
                                                                         <div class="modal-body">
                                                                             <div class="row">
+                                                                                
+                                                                                <div class="col-md-6 mb-2">
+                                                                                    <label class="form-label">Init
+                                                                                        Code</label>
+                                                                                    <input
+                                                                                        class="form-control form-control-lg"
+                                                                                        name="init_code"
+                                                                                        value="{{ $initCode }}"
+                                                                                        placeholder="Enter init code">
+                                                                                </div>
+
+                                                                                <div class="col-md-6 mb-2">
+                                                                                    <label class="form-label">Wrap
+                                                                                        Code</label>
+                                                                                    <input
+                                                                                        class="form-control form-control-lg"
+                                                                                        name="wrap_code"
+                                                                                        value="{{ $wrapCode }}"
+                                                                                        placeholder="Enter wrap code">
+                                                                                </div>
 
                                                                                 <div class="col-md-12 mb-2">
                                                                                     <label class="form-label">MobileNig
