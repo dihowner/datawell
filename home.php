@@ -74,7 +74,7 @@
               </div>
 
               <div data-aos="fade-left" data-aos-duration="1000" class="w-full md:w-1/2 h-60 md:h-full bg-zinc-200 order-first md:order-last">
-                <img src="images/Cheaper_Data_Bundle_now_available_for_University_Students.webp"/>
+                <img src="images/dw_signup.jpg"/>
               </div>
             </div>
           </div>

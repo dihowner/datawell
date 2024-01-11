@@ -64,9 +64,9 @@ class WithdrawalController extends Controller
             $message = $responseContent->message;
 
             if($responseCode === 200) {
-                Alert::success("Success", $message);
+                Alert::success("Success", $message)->autoClose(10000);
             } else {
-                Alert::error("Error", $message);
+                Alert::error("Error", $message)->autoClose(10000);
             }
             return redirect()->back();
         }
@@ -115,9 +115,9 @@ class WithdrawalController extends Controller
         $approveWithdrawal = $this->withdrawalService->updateWithdrawal($id, "approve");
         $decodeResponse = json_decode($approveWithdrawal->getContent(), true);
         if($approveWithdrawal->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -126,9 +126,9 @@ class WithdrawalController extends Controller
         $declineWithdrawal = $this->withdrawalService->updateWithdrawal($id, "decline");
         $decodeResponse = json_decode($declineWithdrawal->getContent(), true);
         if($declineWithdrawal->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }

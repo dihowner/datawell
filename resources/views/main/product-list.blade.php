@@ -65,11 +65,16 @@
                                                 </div>
 
                                                 <div class="col-sm-2 col-xs-4">
-                                                    <a href="{{ route('product-list') }}" class="btn btn-dark btn-lg btn-block"><i
-                                                        class="fa fa-refresh"></i> Reset</a>
+                                                    <a href="{{ route('product-list') }}"
+                                                        class="btn btn-dark btn-lg btn-block"><i
+                                                            class="fa fa-refresh"></i> Reset</a>
                                                 </div>
                                             </div>
                                         </form>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <h4>Total Products : {{ $totalProduct }} </h4>
                                     </div>
 
                                     <div class="table-responsive mb-2">
@@ -87,7 +92,7 @@
                                             </thead>
                                             <tbody>
 
-                                                @if (count($allProduct) > 0)
+                                                @if ($allProduct != null)
                                                     @php
                                                         $i = 1;
                                                     @endphp
@@ -143,7 +148,7 @@
                                                 @endif
                                             </tbody>
                                         </table>
-                                        @if (count($allProduct) > 0)
+                                        @if ($allProduct != null)
                                             {{ $allProduct->links('components.custom-paginator') }}
                                         @endif
                                     </div>

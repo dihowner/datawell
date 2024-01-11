@@ -78,9 +78,9 @@ class AdminController extends Controller
 
         $decodeResponse = json_decode($updateMonnify->getContent(), true);
         if($updateMonnify->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -90,9 +90,9 @@ class AdminController extends Controller
                 
         $decodeResponse = json_decode($updateBankSettings->getContent(), true);
         if($updateBankSettings->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -102,9 +102,9 @@ class AdminController extends Controller
                 
         $decodeResponse = json_decode($updateFlutterwave->getContent(), true);
         if($updateFlutterwave->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -114,9 +114,9 @@ class AdminController extends Controller
                 
         $decodeResponse = json_decode($updatePaystack->getContent(), true);
         if($updatePaystack->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -126,9 +126,9 @@ class AdminController extends Controller
                 
         $decodeResponse = json_decode($updateAirtimeInfo->getContent(), true);
         if($updateAirtimeInfo->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -139,9 +139,9 @@ class AdminController extends Controller
                 
         $decodeResponse = json_decode($updateAirtimeConversion->getContent(), true);
         if($updateAirtimeConversion->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }

@@ -51,7 +51,7 @@
                                             <label for="dataVolume" class="form-label">Data Volume</label>
                                             <select class="form-control form-control-lg dataVolume" name="dataVolume">
                                                 <option value="">-- Select Data Volume--</option>
-                                                @if (count($getDataVolumes) > 0)
+                                                @if ($getDataVolumes)
                                                     @foreach ($getDataVolumes as $productInfo)
                                                         @php
                                                             $productPricing = $productInfo['productpricing'];

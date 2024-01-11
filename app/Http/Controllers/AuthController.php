@@ -127,7 +127,7 @@ class AuthController extends Controller
             Alert::success('Success', $message);
         } 
         else {
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -144,7 +144,7 @@ class AuthController extends Controller
             Alert::success('Success', $message);
         } 
         else {
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }

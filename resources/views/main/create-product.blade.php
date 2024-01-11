@@ -73,7 +73,7 @@
 
                                             <div class="form-group mb-2">
                                                 <label class="form-label">Cost Price</label>
-                                                <input type="number" min="0" name="cost_price"
+                                                <input type="text" name="cost_price"
                                                     class="form-control form-control-lg" placeholder="Enter cost price">
                                             </div>
 

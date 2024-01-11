@@ -28,8 +28,9 @@ class DataPurchaseRequest extends FormRequest
             return [
                 "product_id" => $this->has('product_id') !== false ? "string|required" : "",
                 "mobilenig" => "nullable",   
-                "init_code" => "string|required",
-                "wrap_code" => "string|required",
+                "smeplug" => "nullable",   
+                "init_code" => "string|nullable",
+                "wrap_code" => "string|nullable",
                 "id" => "excludeif:create-data-request,create-data-request"         
             ];
         }

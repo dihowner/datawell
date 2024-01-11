@@ -24,8 +24,10 @@ class ProductController extends Controller
     }
 
     public function allProducts() {
-        $allProduct = $this->productService->allProducts();
-        return view('main.product-list', compact('allProduct'));
+        $products = $this->productService->allProducts();
+        $allProduct = $products[0];
+        $totalProduct = $products[1];
+        return view('main.product-list', compact('allProduct', 'totalProduct'));
     }
 
     public function fetchProductCategory($category) {
@@ -48,9 +50,9 @@ class ProductController extends Controller
         
         $decodeResponse = json_decode($deleteProduct->getContent(), true);
         if($deleteProduct->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->route('product-list');
     }
@@ -68,9 +70,9 @@ class ProductController extends Controller
 
         $decodeResponse = json_decode($createProduct->getContent(), true);
         if($createProduct->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->route('product-list');
     }
@@ -99,7 +101,7 @@ class ProductController extends Controller
         
         $decodeResponse = json_decode($updateCostPrice->getContent(), true);
         if($updateCostPrice->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
             Alert::error("Error", "Bad Request");
         }

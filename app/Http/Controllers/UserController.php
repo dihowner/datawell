@@ -44,10 +44,10 @@ class UserController extends Controller
         $message = $responseContent->message;
 
         if($responseCode === 200) {
-            Alert::success('Success', $message);
+            Alert::success('Success', $message)->autoClose(10000);
         }
         else {
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -70,10 +70,10 @@ class UserController extends Controller
         $message = $responseContent->message;
 
         if($responseCode === 200) {
-            Alert::success('Success', $message);
+            Alert::success('Success', $message)->autoClose(10000);
         }
         else {
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -95,9 +95,9 @@ class UserController extends Controller
         $responseContent = json_decode($planUpgrade->content());
         $message = $responseContent->message;
         if($responseCode === 200) {
-            Alert::success("Success", $message);
+            Alert::success("Success", $message)->autoClose(10000);
         } else {
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -127,7 +127,7 @@ class UserController extends Controller
         $updateUser = $this->userService->updateUser($request->validated());
         $decodeResponse = json_decode($updateUser->getContent(), true);
         if($updateUser->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
             Alert::error("Error", "Error processing request");
         }

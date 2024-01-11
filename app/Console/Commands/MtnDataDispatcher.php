@@ -12,6 +12,7 @@ use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\DataRequestService;
+use App\Vendors\Smeplug;
 
 class MtnDataDispatcher extends Command
 {
@@ -76,6 +77,7 @@ class MtnDataDispatcher extends Command
                             "provider_service_id" => $vendorRequest[$vendorCode],
                             "category" => "data"
                         ];
+                        Log::info($purchaseData);
                         self::updateOrder($uniqueReference, self::sendToProvider($purchaseData, $theProductApi));          
                     }
                 }
@@ -87,11 +89,24 @@ class MtnDataDispatcher extends Command
         try {
             $decodeResponse = json_decode($providerResponse->getContent(), true)["data"];
 
+            Log::info($providerResponse->getContent());
+
             if($providerResponse->getStatusCode() === 200) {
                 // decode the provider response...
                 $txStatus = $decodeResponse['delivery_status'];
-                
-                Transaction::where(['status' => '0', 'reference' => $reference])->update(["status" => $txStatus, "response" => json_encode($decodeResponse)]);
+                if(isset($decodeResponse["transaction_reference"])) {
+                    $transactReference = $decodeResponse["transaction_reference"];
+                } else if(isset($decodeResponse["ref"])) {
+                    $transactReference = $decodeResponse["ref"];
+                }  else if(isset($decodeResponse["reference"])) {
+                    $transactReference = $decodeResponse["reference"];
+                } else {
+                    $transactReference = NULL;
+                }
+
+                Transaction::where(['status' => '0', 'reference' => $reference])->update(["status" => $txStatus, 
+                    "transaction_reference" => $transactReference, "response" => json_encode($decodeResponse)
+                ]);
                 WalletOut::where(['status' => '0', 'reference' => $reference])->update(["status" => $txStatus]);
             } else {
                 // Let's find the transaction and perform a refund if it fails...
@@ -163,6 +178,12 @@ class MtnDataDispatcher extends Command
             case "mobilenig":
                 // Let's prepare some key info about the delivery of the order...
                 $connectVendor = app(MobileNig::class);
+                $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
+            break;
+            
+            case "smeplug":
+                // Let's prepare some key info about the delivery of the order...
+                $connectVendor = app(Smeplug::class);
                 $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
             break;
         }

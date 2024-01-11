@@ -9,6 +9,7 @@ use App\Services\UtilityService;
 use App\Services\TransactionService;
 use App\Services\ProductPricingService;
 use App\Http\Traits\ResponseTrait;
+use App\Vendors\Smeplug;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -512,6 +513,8 @@ class PurchaseService {
         // Send it to the provider...
         $sendToProvider = $this->sendToProvider($purchaseData, $theProductApi);
 
+        // return $sendToProvider;
+
         $transactionData["vendorRequest"] = $vendorRequest;
         $transactionData["purchase"] = $purchaseData;
         $transactionData["productInfo"] = $theProduct;
@@ -533,6 +536,12 @@ class PurchaseService {
             case "mobilenig":
                 // Let's prepare some key info about the delivery of the order...
                 $connectVendor = app(MobileNig::class);
+                $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
+            break;
+
+            case "smeplug":
+                // Let's prepare some key info about the delivery of the order...
+                $connectVendor = app(Smeplug::class);
                 $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
             break;
         }
@@ -579,6 +588,16 @@ class PurchaseService {
                 $sellingPrice = (float) $transactionData["selling_price"];
                 $newUserBalance = (float) $userBalance - $sellingPrice;
 
+                if(isset($decodeResponse["transaction_reference"])) {
+                    $transactReference = $decodeResponse["transaction_reference"];
+                } else if(isset($decodeResponse["ref"])) {
+                    $transactReference = $decodeResponse["ref"];
+                }  else if(isset($decodeResponse["reference"])) {
+                    $transactReference = $decodeResponse["reference"];
+                } else {
+                    $transactReference = NULL;
+                }
+
                 // Transaction history record...
                 $transactData = [
                     "user_id" => $transactionData["user_id"],
@@ -591,7 +610,7 @@ class PurchaseService {
                     "new_balance" => (float) $newUserBalance,
                     "costprice" => (float) $transactionData["cost_price"],
                     "category" => $purchaseCategory,
-                    "transaction_reference" => isset($decodeResponse["transaction_reference"]) ? $decodeResponse["transaction_reference"] : NULL,
+                    "transaction_reference" => $transactReference,
                     "reference" => $this->uniqueReference,
                     "pin_details" => isset($decodeResponse["pin_detail"]) ? json_encode($decodeResponse["pin_detail"]) : NULL,
                     "token_details" => isset($decodeResponse["token_detail"]) ? json_encode($decodeResponse["token_detail"]) : NULL,

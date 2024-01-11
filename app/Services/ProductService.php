@@ -177,7 +177,7 @@ class ProductService {
                 return $products;
             });
             $paginatedRecords = PaginatorHelper::createPaginator($products, 20, request()->get('page'), request()->url());
-            return $paginatedRecords;
+            return [$paginatedRecords, count($products)];
         }
 
         return false;

@@ -25,18 +25,23 @@
                     </div>
 
                     <div class="form-group mb-2">
-                        <label for="serviceType" class="form-label">Mobile Nig</label>
-                        <input class="form-control form-control-lg" name="mobilenig" placeholder="Enter mobilenig code">
-                    </div>
-
-                    <div class="form-group mb-2">
-                        <label for="serviceType" class="form-label">Init Code</label>
+                        <label for="init_code" class="form-label">Init Code</label>
                         <input class="form-control form-control-lg" name="init_code" placeholder="Enter init code">
                     </div>
 
                     <div class="form-group mb-2">
-                        <label for="serviceType" class="form-label">Wrap Code</label>
+                        <label for="wrap_code" class="form-label">Wrap Code</label>
                         <input class="form-control form-control-lg" name="wrap_code" placeholder="Enter wrap code">
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="mobilenig" class="form-label">Mobile Nig</label>
+                        <input class="form-control form-control-lg" name="mobilenig" placeholder="Enter mobilenig code">
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="smeplug" class="form-label">Smeplug</label>
+                        <input class="form-control form-control-lg" name="smeplug" placeholder="Enter smeplug code">
                     </div>
 
                 </div>

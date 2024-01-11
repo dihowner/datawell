@@ -40,39 +40,7 @@
                     Data Pricing
                 </h1>
                 <div class="md:flex mt-5 space-y-10 md:mt-8 lg:mt-10 md:space-y-0 lg:space-x-4 md:between-start">
-                    <div data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                        class="p-8 lg:p-12 bg-white h-fit rounded-lg shadow-md lg:shadow-xl lg:min-w-[310px] xl:min-w-[370px] col-center">
-                        <img alt="Glo" data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                            loading="lazy" width="128" height="128" decoding="async" data-nimg="1"
-                            class="object-contain mx-auto w-20 h-20 rounded-full md:h-24 md:w-24 lg:w-32 lg:h-32 bg-gray-50"
-                            src="images/globacom.png" />
-                        <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                            class="mt-1 text-sm text-center font-bold md:text-base lg:mt-2">
-                            Glo
-                        </p>
-                        <div class="mt-8 space-y-4 lg:space-y-8 md:mt-12 lg:mt-16">
-                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                                class="space-x-4 text-sm flex justify-center lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">3.9GB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦900</span>
-                            </p>
-                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                                class="space-x-4 text-sm flex justify-center lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">20GB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦7200</span>
-                            </p>
-                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                                class="space-x-4 text-sm flex justify-center lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">26GB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦9000</span>
-                            </p>
-                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                                class="space-x-4 text-sm flex justify-center lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">42GB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦13500</span>
-                            </p>
-                        </div>
-                    </div>
+
                     <div data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                         class="p-8 lg:p-12 bg-white h-fit rounded-lg shadow-md lg:shadow-xl lg:min-w-[310px] xl:min-w-[370px] col-center">
                         <img alt="MTN" data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
@@ -86,31 +54,95 @@
                         <div class="mt-8 space-y-4 lg:space-y-8 md:mt-12 lg:mt-16">
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">500MB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦140</span>
-                            </p>
-                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                                class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
                                 <span class="text-gray-500">1GB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦230</span>
+                                    class="font-bold text-gray-800">₦300</span>
                             </p>
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
                                 <span class="text-gray-500">2GB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦460</span>
+                                    class="font-bold text-gray-800">₦600</span>
                             </p>
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
                                 <span class="text-gray-500">5GB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦1150</span>
+                                    class="font-bold text-gray-800">₦1500</span>
                             </p>
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
                                 <span class="text-gray-500">10GB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦2300</span>
+                                    class="font-bold text-gray-800">₦3000</span>
                             </p>
                         </div>
                     </div>
+
+                    <div data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                        class="p-8 lg:p-12 bg-white h-fit rounded-lg shadow-md lg:shadow-xl lg:min-w-[310px] xl:min-w-[370px] col-center">
+                        <img alt="Airtel" data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                            loading="lazy" width="128" height="128" decoding="async" data-nimg="1"
+                            class="object-contain mx-auto w-20 h-20 rounded-full md:h-24 md:w-24 lg:w-32 lg:h-32 bg-gray-50"
+                            src="/images/airtel.jpg" />
+                        <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                            class="mt-1 text-sm text-center font-bold md:text-base lg:mt-2">
+                            Airtel
+                        </p>
+                        <div class="mt-8 space-y-4 lg:space-y-8 md:mt-12 lg:mt-16">
+                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                                class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
+                                <span class="text-gray-500">1GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦250</span>
+                            </p>
+                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                                class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
+                                <span class="text-gray-500">2GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦500</span>
+                            </p>
+                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                                class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
+                                <span class="text-gray-500">5GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦1250</span>
+                            </p>
+                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                                class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
+                                <span class="text-gray-500">10GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦2500</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                        class="p-8 lg:p-12 bg-white h-fit rounded-lg shadow-md lg:shadow-xl lg:min-w-[310px] xl:min-w-[370px] col-center">
+                        <img alt="Glo" data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                            loading="lazy" width="128" height="128" decoding="async" data-nimg="1"
+                            class="object-contain mx-auto w-20 h-20 rounded-full md:h-24 md:w-24 lg:w-32 lg:h-32 bg-gray-50"
+                            src="images/globacom.png" />
+                        <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                            class="mt-1 text-sm text-center font-bold md:text-base lg:mt-2">
+                            Glo
+                        </p>
+                        <div class="mt-8 space-y-4 lg:space-y-8 md:mt-12 lg:mt-16">
+                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                                class="space-x-4 text-sm flex justify-center lg:space-x-8 between md:text-base">
+                                <span class="text-gray-500">1GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦275</span>
+                            </p>
+                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                                class="space-x-4 text-sm flex justify-center lg:space-x-8 between md:text-base">
+                                <span class="text-gray-500">2GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦550</span>
+                            </p>
+                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                                class="space-x-4 text-sm flex justify-center lg:space-x-8 between md:text-base">
+                                <span class="text-gray-500">5GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦1375</span>
+                            </p>
+                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
+                                class="space-x-4 text-sm flex justify-center lg:space-x-8 between md:text-base">
+                                <span class="text-gray-500">10GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦2750</span>
+                            </p>
+                        </div>
+                    </div>
+
                     <div data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                         class="p-8 lg:p-12 bg-white h-fit rounded-lg shadow-md lg:shadow-xl lg:min-w-[310px] xl:min-w-[370px] col-center">
                         <img alt="9Mobile" data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
@@ -125,54 +157,38 @@
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
                                 <span class="text-gray-500">500MB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦475</span>
+                                    class="font-bold text-gray-800">₦530</span>
                             </p>
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">1.536GB</span><span
-                                    class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦950</span>
+                                <span class="text-gray-500">1.5GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦1000</span>
                             </p>
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">2.048GB</span><span
-                                    class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦1140</span>
+                                <span class="text-gray-500">2GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦1300</span>
                             </p>
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
                                 <span class="text-gray-500">3.072GB</span><span
                                     class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦1425</span>
+                                    class="font-bold text-gray-800">₦1550</span>
                             </p>
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">4.608GB</span><span
-                                    class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦1900</span>
+                                <span class="text-gray-500">4.5GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦2050</span>
                             </p>
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">11.264GB</span><span
-                                    class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦3800</span>
+                                <span class="text-gray-500">11GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦4000</span>
                             </p>
                             <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
                                 class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">15.36GB</span><span
-                                    class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦4750</span>
-                            </p>
-                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                                class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">40.96GB</span><span
-                                    class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦9500</span>
-                            </p>
-                            <p data-aos="fade-up" data-aos-once="true" data-aos-duration="1000"
-                                class="space-x-4 text-sm flex justify-between lg:space-x-8 between md:text-base">
-                                <span class="text-gray-500">76.8GB</span><span class="text-gray-500">=&gt;</span><span
-                                    class="font-bold text-gray-800">₦14250</span>
+                                <span class="text-gray-500">15GB</span><span class="text-gray-500">=&gt;</span><span
+                                    class="font-bold text-gray-800">₦4950</span>
                             </p>
                         </div>
                     </div>

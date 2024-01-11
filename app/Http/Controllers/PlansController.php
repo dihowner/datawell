@@ -47,9 +47,9 @@ class PlansController extends Controller
         $deletePlan = $this->planService->deletePlan($planId);
         $decodeResponse = json_decode($deletePlan->getContent(), true);
         if($deletePlan->getStatusCode() == 204) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -60,9 +60,9 @@ class PlansController extends Controller
         $updatePlan = $this->planService->updatePlan($planData , $id);
         $decodeResponse = json_decode($updatePlan->getContent(), true);
         if($updatePlan->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -91,9 +91,9 @@ class PlansController extends Controller
         
         $decodeResponse = json_decode($createPlan->getContent(), true);
         if($createPlan->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->route('planlist');
     }

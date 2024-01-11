@@ -35,9 +35,9 @@ class CabletvRequestController extends Controller
         $updateRequest = $this->cabletvRequestService->updateCableTvRequest($request->validated());
         $decodeResponse = json_decode($updateRequest->getContent(), true);
         if($updateRequest->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -46,9 +46,9 @@ class CabletvRequestController extends Controller
         $deleteRequest = $this->cabletvRequestService->deleteRequest($id);
         $decodeResponse = json_decode($deleteRequest->getContent(), true);
         if($deleteRequest->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -57,9 +57,9 @@ class CabletvRequestController extends Controller
         $createRequest = $this->cabletvRequestService->createCabletvRequest($request->validated());
         $decodeResponse = json_decode($createRequest->getContent(), true);
         if($createRequest->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }

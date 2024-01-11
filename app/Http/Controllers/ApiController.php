@@ -29,9 +29,9 @@ class ApiController extends Controller
         $deleteApi = $this->apiService->deleteApi($apiId);
         $decodeResponse = json_decode($deleteApi->getContent(), true);
         if($deleteApi->getStatusCode() == 204) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -58,9 +58,9 @@ class ApiController extends Controller
         $createApi = $this->apiService->createApi($createData);
         $decodeResponse = json_decode($createApi->getContent(), true);
         if($createApi->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->route('api-index');
     }
@@ -71,9 +71,9 @@ class ApiController extends Controller
         
         $decodeResponse = json_decode($updateApi->getContent(), true);
         if($updateApi->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->route('api-index');
     }
@@ -89,9 +89,9 @@ class ApiController extends Controller
     public function updateApiSwitchSettings(ApiRequest $request) {
         $newApiId = $request->validated()['categoryApi'];
         $updateApi = $this->apiService->updateApiSwitchSettings($newApiId);
-        
+
         $decodeResponse = json_decode($updateApi->getContent(), true);
-        Alert::success("Success", $decodeResponse['message']);
+        Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         return redirect()->back();
     }
 

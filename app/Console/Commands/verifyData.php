@@ -7,6 +7,7 @@ use App\Models\WalletOut;
 use App\Vendors\MobileNig;
 use App\Models\Transaction;
 use App\Services\WalletService;
+use App\Vendors\Smeplug;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -71,12 +72,23 @@ class verifyData extends Command
 
     private function updateOrder($reference, $providerResponse) {
         $decodeResponse = json_decode($providerResponse->getContent(), true)["data"];
+        if(isset($decodeResponse["transaction_reference"])) {
+            $transactReference = $decodeResponse["transaction_reference"];
+        } else if(isset($decodeResponse["ref"])) {
+            $transactReference = $decodeResponse["ref"];
+        }  else if(isset($decodeResponse["reference"])) {
+            $transactReference = $decodeResponse["reference"];
+        } else {
+            $transactReference = NULL;
+        }
         
         if($providerResponse->getStatusCode() === 200) {
             // decode the provider response...
             $txStatus = $decodeResponse['delivery_status'];
             
-            Transaction::whereIn("status", ['0', '2'])->where(['reference' => $reference])->update(["status" => $txStatus, "response" => json_encode($decodeResponse)]);
+            Transaction::whereIn("status", ['0', '2'])->where(['reference' => $reference])->update([
+                "status" => $txStatus, "transaction_reference" => $transactReference, "response" => json_encode($decodeResponse)
+            ]);
             WalletOut::where(['status' => '0', 'reference' => $reference])->update(["status" => $txStatus]);
         } else {
             try {
@@ -150,6 +162,12 @@ class verifyData extends Command
             case "mobilenig":
                 // Let's prepare some key info about the delivery of the order...
                 $connectVendor = app(MobileNig::class);
+                $submitOrder = $connectVendor->processRequest($verifyData, $apiDetails);
+            break;
+            
+            case "smeplug":
+                // Let's prepare some key info about the delivery of the order...
+                $connectVendor = app(Smeplug::class);
                 $submitOrder = $connectVendor->processRequest($verifyData, $apiDetails);
             break;
         }

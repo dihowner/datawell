@@ -20,7 +20,7 @@ class FlutterwaveController extends Controller
         if (method_exists($getLink, 'getStatusCode')) {
             $responseContent = json_decode($getLink->content());
             $message = $responseContent->message;
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
             // redirect the user back to funding view page
             return redirect()->route('user.fund-wallet-view');
         }
@@ -33,9 +33,9 @@ class FlutterwaveController extends Controller
         $responseContent = json_decode($approvePayment->content());
         $message = $responseContent->message;
         if($responseCode === 200) {
-            Alert::success("Success", $message);
+            Alert::success("Success", $message)->autoClose(10000);
         } else {
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->route('user.fund-wallet-view');
     }

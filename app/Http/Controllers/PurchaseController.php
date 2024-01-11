@@ -77,11 +77,11 @@ class PurchaseController extends Controller
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message. " Kindly check your balance";
-            Alert::success("Success", $message);
+            Alert::success("Success", $message)->autoClose(10000);
         }
         else {
             $message = $responseContent["message"];
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -131,10 +131,12 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $getDataVolumes = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "Data Bundle");
 
-        if(method_exists($getDataVolumes, 'getStatusCode')) {
-            Alert::error("Error", "Something went wrong. Unable to fetch 9mobile Data Services");
-            return redirect()->route('user.index');
-        }
+        // return $getDataVolumes->getStatusCode();;
+
+        // if(method_exists($getDataVolumes, 'getStatusCode')) {
+        //     Alert::error("Error", "Something went wrong. Unable to fetch 9mobile Data Services");
+        //     return redirect()->route('user.index');
+        // }
 
         return view('private.buy-9mobile-data', compact('userDetail', 'getDataVolumes'));
     }
@@ -149,17 +151,19 @@ class PurchaseController extends Controller
 
         $processData = $this->purchaseService->purchaseData($productId, $phoneNumber, $transactPin);
         
+        // return $processData;
+
         $responseCode = $processData->getStatusCode();
         $responseContent = json_decode($processData->content(), true);
 
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message. " Kindly check your balance";
-            Alert::success("Success", $message);
+            Alert::success("Success", $message)->autoClose(10000);
         }
         else {
             $message = $responseContent["message"];
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -174,7 +178,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $dstvCategories = $this->categoryController->getSubCategory('Dstv');
 
-        if(method_exists($dstvCategories, 'getStatusCode')) {
+        if($dstvCategories == NULL OR method_exists($dstvCategories, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch Dstv Services");
             return redirect()->route('user.index');
         }
@@ -186,7 +190,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $gotvCategories = $this->categoryController->getSubCategory('Gotv');
 
-        if(method_exists($gotvCategories, 'getStatusCode')) {
+        if($gotvCategories == NULL OR method_exists($gotvCategories, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch Gotv Services");
             return redirect()->route('user.index');
         }
@@ -198,7 +202,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $startimesPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "Startimes");
 
-        if(method_exists($startimesPackages, 'getStatusCode')) {
+        if($startimesPackages == NULL OR method_exists($startimesPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch Startimes Services");
             return redirect()->route('user.index');
         }
@@ -236,11 +240,11 @@ class PurchaseController extends Controller
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message;
-            Alert::success("Success", $message);
+            Alert::success("Success", $message)->autoClose(10000);
         }
         else {
             $message = $responseContent["message"];
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -254,7 +258,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $waecPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "Waec");
 
-        if(method_exists($waecPackages, 'getStatusCode')) {
+        if($waecPackages == NULL OR method_exists($waecPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch WAEC Services");
             return redirect()->route('user.index');
         }
@@ -267,7 +271,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $necoPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "Neco");
 
-        if(method_exists($necoPackages, 'getStatusCode')) {
+        if($necoPackages == NULL OR method_exists($necoPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch NECO Services");
             return redirect()->route('user.index');
         }
@@ -290,11 +294,11 @@ class PurchaseController extends Controller
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message;
-            Alert::success("Success", $message);
+            Alert::success("Success", $message)->autoClose(10000);
         }
         else {
             $message = $responseContent["message"];
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -308,7 +312,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $ibedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "IBEDC (IBADAN)");
 
-        if(method_exists($ibedcPackages, 'getStatusCode')) {
+        if($ibedcPackages == NULL OR method_exists($ibedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch IBEDC (IBADAN) Services");
             return redirect()->route('user.index');
         }
@@ -321,7 +325,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $phedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "PHEDC (PORTHARCOURT)");
 
-        if(method_exists($phedcPackages, 'getStatusCode')) {
+        if($phedcPackages == NULL OR method_exists($phedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch PHEDC (PORTHARCOURT) Services");
             return redirect()->route('user.index');
         }
@@ -334,7 +338,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $aedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "AEDC (ABUJA)");
 
-        if(method_exists($aedcPackages, 'getStatusCode')) {
+        if($aedcPackages == NULL OR method_exists($aedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch AEDC (ABUJA) Services");
             return redirect()->route('user.index');
         }
@@ -347,7 +351,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $kedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "KEDC (KANO)");
 
-        if(method_exists($kedcPackages, 'getStatusCode')) {
+        if($kedcPackages == NULL OR method_exists($kedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch KEDC (KANO) Services");
             return redirect()->route('user.index');
         }
@@ -360,7 +364,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $kaedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "KAEDC (KADUNA)");
 
-        if(method_exists($kaedcPackages, 'getStatusCode')) {
+        if($kaedcPackages == NULL OR method_exists($kaedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch KAEDC (KADUNA) Services");
             return redirect()->route('user.index');
         }
@@ -373,7 +377,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $eedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "EEDC (ENUGU)");
 
-        if(method_exists($eedcPackages, 'getStatusCode')) {
+        if($eedcPackages == NULL OR method_exists($eedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch EEDC (ENUGU) Services");
             return redirect()->route('user.index');
         }
@@ -386,7 +390,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $jedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "JEDC (JOS)");
 
-        if(method_exists($jedcPackages, 'getStatusCode')) {
+        if($jedcPackages == NULL OR method_exists($jedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch JEDC (JOS) Services");
             return redirect()->route('user.index');
         }
@@ -399,7 +403,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $ekedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "EKEDC (EKO)");
 
-        if(method_exists($ekedcPackages, 'getStatusCode')) {
+        if($ekedcPackages == NULL OR method_exists($ekedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch EKEDC (EKO) Services");
             return redirect()->route('user.index');
         }
@@ -412,7 +416,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $ikedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "IKEDC (IKEJA)");
 
-        if(method_exists($ikedcPackages, 'getStatusCode')) {
+        if($ikedcPackages == NULL OR method_exists($ikedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch IKEDC (IKEJA) Services");
             return redirect()->route('user.index');
         }
@@ -472,11 +476,11 @@ class PurchaseController extends Controller
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message;
-            Alert::success("Success", $message);
+            Alert::success("Success", $message)->autoClose(10000);
         }
         else {
             $message = $responseContent["message"];
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }

@@ -27,8 +27,8 @@ class AirtimeRequest extends FormRequest
         if(in_array(Route::currentRouteName(), ["create-airtime-request", "update-airtime-request"])) {
             return [
                 "product_id" => $this->has('product_id') !== false ? "string|required" : "",
-                "init_code" => "string|required",
-                "wrap_code" => "string|required",
+                "init_code" => "string|nullable",
+                "wrap_code" => "string|nullable",
                 "mobilenig" => "nullable",   
                 "id" => "excludeif:create-airtime-request,create-airtime-request",          
             ];

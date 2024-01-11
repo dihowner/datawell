@@ -56,6 +56,11 @@ class CategoryService  {
         $airtimeCategories = [
             [
                 "id" => NULL,
+                "category_name" => "9mobile Data",
+                "parent_category" => "Data Bundle"
+            ],
+            [
+                "id" => NULL,
                 "category_name" => "MTN",
                 "parent_category" => "Airtime Topup"
             ],
@@ -83,8 +88,14 @@ class CategoryService  {
         foreach($mergeCategories as $categoryIndex => $categoryValue) {
             $categoryId = $categoryValue['id'];
             if($categoryId == NULL) {
-                $product_name = $categoryValue['category_name']; //Because we hard-coded the list..
-                $product = $this->productService->getProductWithCategoryId_ProductName("", $product_name);
+                $categoryName = strtolower($categoryValue['category_name']);
+                if(strpos($categoryName, '9mobile') !== false AND strpos($categoryName, 'data') !== false) {
+                    $categoryId = self::getCategoryByName('Data Bundle')->id;
+                    $product = $this->productService->getProductWithCategoryId_ProductName($categoryId, "");                    
+                } else {
+                    $product_name = $categoryValue['category_name']; //Because we hard-coded the list..
+                    $product = $this->productService->getProductWithCategoryId_ProductName("", $product_name);
+                }
             } else {
                 $product = $this->productService->getProductWithCategoryId_ProductName($categoryId);
             }
@@ -95,10 +106,7 @@ class CategoryService  {
                 $mergeCategories[$categoryIndex]["current_api_id"] = 0;
             }
         }
-        
-        $allCategories = (object) collect($mergeCategories);
 
-        return $allCategories;
-        
+        return $mergeCategories;
     }
 }

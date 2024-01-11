@@ -70,6 +70,8 @@ class MobileNig {
                         "amount" => self::getPackagePrice($serviceId, $requestType, $bodyRequest["provider_service_id"], $apiDetails)
                     ];
     
+                    // return $requestPayload;
+
                     $processOrder = HttpRequest::sendPost($this->endpoint, $requestPayload, $authHeader);
                     return $this->checkPurchaseResponse($processOrder->body());
                 break;
@@ -348,8 +350,12 @@ class MobileNig {
             $network = "mtn";
         } else if(strpos($bundleId, "9mobile") !== false) {
             $network = "9mobile";
+        } else if(strpos($bundleId, "glo") !== false AND (strpos($bundleId, "sme") !== false OR strpos($bundleId, "cg") !== false)) {
+            $network = "glosme";
         } else if(strpos($bundleId, "glo") !== false) {
             $network = "glo";
+        } else if(strpos($bundleId, "airtel") !== false AND (strpos($bundleId, "sme") !== false OR strpos($bundleId, "cg") !== false)) {
+            $network = "airtelsme";
         } else if(strpos($bundleId, "airtel") !== false) {
             $network = "airtel";
         } else {
@@ -362,6 +368,8 @@ class MobileNig {
             "9mobile" => "GIFTING",
             "glo" => "GIFTING",
             "airtel" => "GIFTING",
+            "airtelsme" => "SME",
+            "glosme" => "SME",
         ];
 
         return $requestType[$network];

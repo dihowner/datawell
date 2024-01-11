@@ -79,6 +79,7 @@ class DataRequestService {
         try {
             $requestId = $requestData['id'];
             $mobilenig = isset($requestData['mobilenig']) ? $requestData['mobilenig'] : NULL;
+            $smeplug = isset($requestData['smeplug']) ? $requestData['smeplug'] : NULL;
             $init_code = isset($requestData['init_code']) ? $requestData['init_code'] : NULL;
             $wrap_code = isset($requestData['wrap_code']) ? $requestData['wrap_code'] : NULL;
             
@@ -91,7 +92,8 @@ class DataRequestService {
             DataRequest::where('id', $requestId)->update([
                 "init_code" => $init_code, 
                 "wrap_code" => $wrap_code,
-                "mobilenig" => $mobilenig
+                "mobilenig" => $mobilenig,
+                "smeplug" => $smeplug
             ]);
             return $this->sendResponse("Data Bundle request updated successfully", [], 200);
         }

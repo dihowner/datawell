@@ -57,6 +57,7 @@
                                                     <th>Init Code</th>
                                                     <th>Wrap Code</th>
                                                     <th>MobileNig</th>
+                                                    <th>Smeplug</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -69,8 +70,9 @@
                                                         @php
                                                             $productName = isset($dataRequest->product->product_name) ? $dataRequest->product->product_name : '';
                                                             $requestId = $dataRequest->id;
-                                                            
+
                                                             $mobileNigCode = $dataRequest->mobilenig;
+                                                            $smeplugCode = $dataRequest->smeplug;
                                                             $initCode = $dataRequest->init_code;
                                                             $wrapCode = $dataRequest->wrap_code;
                                                         @endphp
@@ -91,6 +93,7 @@
                                                             <td>{{ $initCode }} </td>
                                                             <td>{{ $wrapCode }} </td>
                                                             <td>{{ $mobileNigCode }} </td>
+                                                            <td>{{ $smeplugCode }} </td>
                                                             <td>
 
                                                                 <a href="javacript:void(0)" data-toggle="modal"
@@ -133,7 +136,7 @@
                                                                         </div>
                                                                         <div class="modal-body">
                                                                             <div class="row">
-                                                                                
+
                                                                                 <div class="col-md-6 mb-2">
                                                                                     <label class="form-label">Init
                                                                                         Code</label>
@@ -154,7 +157,7 @@
                                                                                         placeholder="Enter wrap code">
                                                                                 </div>
 
-                                                                                <div class="col-md-12 mb-2">
+                                                                                <div class="col-md-6 mb-2">
                                                                                     <label class="form-label">MobileNig
                                                                                         Code</label>
                                                                                     <input
@@ -162,6 +165,16 @@
                                                                                         name="mobilenig"
                                                                                         value="{{ $mobileNigCode }}"
                                                                                         placeholder="Enter mobilenig code">
+                                                                                </div>
+
+                                                                                <div class="col-md-6 mb-2">
+                                                                                    <label class="form-label">Smeplug
+                                                                                        Code</label>
+                                                                                    <input
+                                                                                        class="form-control form-control-lg"
+                                                                                        name="smeplug"
+                                                                                        value="{{ $smeplugCode }}"
+                                                                                        placeholder="Enter smeplug code">
                                                                                 </div>
 
                                                                             </div>

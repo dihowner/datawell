@@ -31,9 +31,9 @@ class EducationRequestController extends Controller
         $createRequest = $this->educationRequestService->creatEducationRequest($request->validated());
         $decodeResponse = json_decode($createRequest->getContent(), true);
         if($createRequest->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -42,9 +42,9 @@ class EducationRequestController extends Controller
         $deleteRequest = $this->educationRequestService->deleteRequest($id);
         $decodeResponse = json_decode($deleteRequest->getContent(), true);
         if($deleteRequest->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -53,9 +53,9 @@ class EducationRequestController extends Controller
         $updateRequest = $this->educationRequestService->updateEducationRequest($request->validated());
         $decodeResponse = json_decode($updateRequest->getContent(), true);
         if($updateRequest->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }

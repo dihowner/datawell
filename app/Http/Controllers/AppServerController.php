@@ -28,10 +28,10 @@ class AppServerController extends Controller
         $createAppServer = $this->appServerService->createAppServer($appData);
         $decodeResponse = json_decode($createAppServer->getContent(), true);
         if($createAppServer->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
             return redirect()->route('app-server');
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
             return redirect()->back();
         }
     }
@@ -40,9 +40,9 @@ class AppServerController extends Controller
         $deleteServer = $this->appServerService->deleteAppServer($appId);
         $decodeResponse = json_decode($deleteServer->getContent(), true);
         if($deleteServer->getStatusCode() == 204) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -52,9 +52,9 @@ class AppServerController extends Controller
         $updateAppServer = $this->appServerService->updateAppServer($appData);
         $decodeResponse = json_decode($updateAppServer->getContent(), true);
         if($updateAppServer->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }

@@ -14,6 +14,7 @@ use App\Http\Controllers\FlutterwaveController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\AirtimeToCashController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -218,6 +219,11 @@ Route::prefix('webhook')->group(function () {
     Route::controller(WalletController::class)->prefix('monnify')->group(function () {
         Route::post('approve', 'approveMonnifyPayment');
     });
+});
+
+Route::controller(TestController::class)->prefix('test')->group(function () {
+    Route::get('mobilenig', 'fetchService');
+    Route::get('smeplug/data', 'fetchSmeplugDataService');
 });
 
 // Admin Routing...

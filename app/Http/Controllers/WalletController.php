@@ -39,7 +39,7 @@ class WalletController extends Controller
         }
 
         $message = $responseContent->message;
-        Alert::error("Error", $message);
+        Alert::error("Error", $message)->autoClose(10000);
         return redirect()->back();
     }
 
@@ -55,7 +55,7 @@ class WalletController extends Controller
         if (method_exists($walletHistories, 'getStatusCode')) {
             $responseContent = json_decode($walletHistories->content());
             $message = $responseContent->message;
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
             // redirect the user back to funding view page
             return redirect()->route('user.fund-wallet-view');
         }
@@ -83,9 +83,9 @@ class WalletController extends Controller
         $responseContent = json_decode($transferFund->content());
         $message = $responseContent->message;
         if($responseCode === 200) {
-            Alert::success("Success", $message);
+            Alert::success("Success", $message)->autoClose(10000);
         } else {
-            Alert::error("Error", $message);
+            Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -133,9 +133,9 @@ class WalletController extends Controller
         $approvePayment = $this->walletService->updatePayment($id, "approve");
         $decodeResponse = json_decode($approvePayment->getContent(), true);
         if($approvePayment->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }
@@ -144,9 +144,9 @@ class WalletController extends Controller
         $declinePayment = $this->walletService->updatePayment($id, "decline");
         $decodeResponse = json_decode($declinePayment->getContent(), true);
         if($declinePayment->getStatusCode() == 200) {
-            Alert::success("Success", $decodeResponse['message']);
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
-            Alert::error("Error", $decodeResponse['message']);
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
         }
         return redirect()->back();
     }

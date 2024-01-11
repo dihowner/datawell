@@ -119,7 +119,13 @@ class ApiService  {
             // So as to limit what we are updating, let's just update those that Admin wishes to change only...
             if($category['current_api_id'] != $newApiId[$i]) {
                 if($category['id'] == NULL) { //Because I created those category and they are a Product on their own
-                    Product::where(["product_name" => $category['category_name']])->update(["api_id" => $newApiId[$i]]);
+                    $categoryName = strtolower($category['category_name']);
+                    if(strpos($categoryName, '9mobile') !== false AND strpos($categoryName, 'data') !== false) {
+                        $categoryId = $this->categoryService->getCategoryByName('Data Bundle')->id;
+                        Product::where(['category_id' => $categoryId])->where('product_name', 'like', '%9mobile%')->update(["api_id" => $newApiId[$i]]);
+                    } else {
+                        Product::where(["product_name" => $category['category_name']])->update(["api_id" => $newApiId[$i]]);
+                    }
                 }
                 else {
                     Product::where(["category_id" => $category['id']])->update(['api_id' => $newApiId[$i]]);
