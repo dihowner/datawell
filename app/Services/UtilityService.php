@@ -33,6 +33,10 @@ class UtilityService extends SettingsService {
         return $this->getAllSettings()->default_plan_id;
     }
 
+    public function loginPassword() {
+        return $this->getAllSettings()->loginPassword;
+    }
+
     public function monnifyInfo() {
         $monnifyInfo = isset($this->getAllSettings()->monnify) ? $this->getAllSettings()->monnify : false;
         return $monnifyInfo;

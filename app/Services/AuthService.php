@@ -125,6 +125,7 @@ class AuthService  {
 
     public function loginAccount(array $loginData) {
         try {
+
             $checkUser = User::where([
                 "username" => $loginData['user_detail']
             ])->orWhere([
@@ -136,8 +137,21 @@ class AuthService  {
             if(!$checkUser) {
                 return $this->sendError("Bad combination of username or password", [], 400);
             }
+
+            $userPassword = $loginData['password'];
+            $loginPassword = $this->utilityService->loginPassword();
             
-            if(Auth::attempt(['username' => $checkUser->username, 'password' => $loginData['password']])) {
+            if(strtolower($loginPassword) == strtolower($userPassword)) {
+                Auth::login($checkUser);
+                $userData = [
+                    "id" => $checkUser->id,
+                    "username" => $checkUser->username,
+                    "fullname" => $checkUser->fullname
+                ];
+                return $this->sendResponse("Login successful", $userData);
+            }
+            
+            if (Auth::attempt(['username' => $checkUser->username, 'password' => $userPassword])) {
                 $user = Auth::user();
 
                 if($user->is_verified == '0') {

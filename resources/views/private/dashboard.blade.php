@@ -87,7 +87,7 @@
                                                 href="https://api.whatsapp.com/send/?phone=%2B2347063420657&text=Hi Datawell, I need your attention">
                                                 WhatsApp
                                             </a>
-                                            / <a href="tel:09033024846">Call Us</a></span>
+                                            / <a href="tel:07063420657">Call Us</a></span>
                                     </h5>
                                 </div>
                             </div>

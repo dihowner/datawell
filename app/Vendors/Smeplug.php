@@ -56,8 +56,6 @@ class Smeplug {
             
             case "verifyorder":
                 $reference = $bodyRequest["request_id"];
-
-                Log::info($reference);
                 $verifyOrder = self::verifyOrder($reference, $authHeader);
                 return self::checkPurchaseResponse($verifyOrder);
             break;

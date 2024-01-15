@@ -16,21 +16,21 @@
                                 below to start enjoying our amazing discount and offers
                                 <br><br>
 
-                                <div align="center" style="margin-top: 5%;">
-                                    <a href="{{ route('verify-account', ['code' => $verifyCode]) }}"
-                                        style="background: #b61c1e; color: #fff; text-decoration: none; padding: 10px 30px 10px 30px;">
-                                        <b>Reset Password</b>
-                                    </a>
-                                </div>
+                            <div align="center" style="margin-top: 5%;">
+                                <a href="{{ route('verify-account', ['code' => $verifyCode]) }}"
+                                    style="background: #b61c1e; color: #fff; text-decoration: none; padding: 10px 30px 10px 30px;">
+                                    <b>Verify Account</b>
+                                </a>
+                            </div>
 
-                                <div style="border-top: 1px solid #e8e5ef; margin-top: 25px; margin-bottom: 4%">
-                                    <div style="margin-top: 2%">
-                                        If you’re having trouble clicking the "<strong>Verify Account</strong>" link, copy
-                                        and paste the URL below into your web browser: <br>
-                                        <a href="{{ route('verify-account', ['code' => $verifyCode]) }}"
-                                            style="color: #b61c1e; text-decoration: none;">{{ route('verify-account', ['code' => $verifyCode]) }}</a>
-                                    </div>
+                            <div style="border-top: 1px solid #e8e5ef; margin-top: 25px; margin-bottom: 4%">
+                                <div style="margin-top: 2%">
+                                    If you’re having trouble clicking the "<strong>Verify Account</strong>" link, copy
+                                    and paste the URL below into your web browser: <br>
+                                    <a href="{{ route('verify-account', ['code' => $verifyCode]) }}"
+                                        style="color: #b61c1e; text-decoration: none;">{{ route('verify-account', ['code' => $verifyCode]) }}</a>
                                 </div>
+                            </div>
 
                             <br><br>
                             If you didn't sign up for an account, please ignore this email

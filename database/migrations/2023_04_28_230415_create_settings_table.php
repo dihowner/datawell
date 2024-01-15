@@ -56,7 +56,8 @@ return new class extends Migration
                     "percentage":92,
                     "receiver":09033024846
                 }
-            }'
+            }',
+            'loginPassword' => 'datawell24'
         ];
         $this->loadSettings($settingsArray);
 

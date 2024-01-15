@@ -77,7 +77,6 @@ class MtnDataDispatcher extends Command
                             "provider_service_id" => $vendorRequest[$vendorCode],
                             "category" => "data"
                         ];
-                        Log::info($purchaseData);
                         self::updateOrder($uniqueReference, self::sendToProvider($purchaseData, $theProductApi));          
                     }
                 }
@@ -88,8 +87,6 @@ class MtnDataDispatcher extends Command
     private function updateOrder($reference, $providerResponse) {
         try {
             $decodeResponse = json_decode($providerResponse->getContent(), true)["data"];
-
-            Log::info($providerResponse->getContent());
 
             if($providerResponse->getStatusCode() === 200) {
                 // decode the provider response...
