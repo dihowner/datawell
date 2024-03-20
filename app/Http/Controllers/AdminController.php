@@ -10,6 +10,7 @@ use App\Services\ProductService;
 use App\Services\SettingsService;
 use App\Http\Requests\SettingsRequest;
 use App\Services\TransactionService;
+use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class AdminController extends Controller
@@ -34,6 +35,13 @@ class AdminController extends Controller
      */
     public function index()
     {
+        $totalPendingPayment = $this->walletService->totalPendingPayment();
+        
+        if ($totalPendingPayment > 0) {
+            Session::flash('info', 'You currently have '. $totalPendingPayment.' pending payment(s) awaiting approval');
+        }
+
+        // dd(Session::all());
         // return auth()->guard('admin')->user();
         return view('main.dashboard');
     }

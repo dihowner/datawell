@@ -29,7 +29,8 @@ class AirtimeRequest extends FormRequest
                 "product_id" => $this->has('product_id') !== false ? "string|required" : "",
                 "init_code" => "string|nullable",
                 "wrap_code" => "string|nullable",
-                "mobilenig" => "nullable",   
+                "mobilenig" => "nullable",
+                "smeplug" => "nullable",   
                 "id" => "excludeif:create-airtime-request,create-airtime-request",          
             ];
         }

@@ -33,13 +33,10 @@ class WalletService {
                 $endDate = Carbon::now()->subMonth()->endOfMonth();
             break;
         }
-
-        $statusOut = ['0', '1', '2', '3'];
-        $sumWalletOut = WalletOut::whereIn('status', $statusOut)->whereBetween('created_at', [$startDate, $endDate])->sum('amount');
+        
         $sumWalletIn = WalletIn::where(['status' => '1'])->whereBetween('created_at', [$startDate, $endDate])->sum('amount');
-        $balanceLeft = (float) $sumWalletIn - $sumWalletOut;
-        $balanceLeft = (float) $balanceLeft <= 0 ? 0 : $balanceLeft;
-        return $balanceLeft;
+        $amount = (float) $sumWalletIn <= 0 ? 0 : $sumWalletIn;
+        return $amount;
     }
 
     public function getUserBalance($userId = "") {
@@ -330,6 +327,7 @@ class WalletService {
                     "old_balance" => $senderCurrentBalance,
                     "amount" => $amount,
                     "new_balance" => $newSenderBalance,
+                    "status" => '1',
                     "remark" => json_encode(["created_by" => $theAuthorizedUser->fullname, "approved_by" => $theAuthorizedUser->fullname]),
                     "created_at" => $dateCreated,
                     "updated_at" => $dateCreated
@@ -344,6 +342,7 @@ class WalletService {
                     "old_balance" => $receiverCurrentBalance,
                     "amount" => $amount,
                     "new_balance" => $newReceiverBalance,
+                    "status" => '1',
                     "remark" => json_encode(["created_by" => $theAuthorizedUser->fullname, "approved_by" => $theAuthorizedUser->fullname]),
                     "created_at" => $dateCreated,
                     "updated_at" => $dateCreated
@@ -433,5 +432,9 @@ class WalletService {
         catch(Exception $e) {
             return $this->sendError("Error!. ".$e->getMessage(), [], 500);
         }
+    }
+
+    public function totalPendingPayment() {
+        return WalletIn::where(['status' => '0', 'channel' => 'bank'])->count();
     }
 }

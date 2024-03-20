@@ -98,7 +98,7 @@
                                             <div class="col-sm-6 mb-3">
                                                 <label for="amount" class="form-label">Enter Amount:</label>
                                                 <input class="form-control form-control-lg amount" name="amount"
-                                                    placeholder="Enter amount" type="number" min="100">
+                                                    placeholder="Enter amount" type="number" min="1000">
                                             </div>
 
                                             <div class="col-sm-6 mb-3">

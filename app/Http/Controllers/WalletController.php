@@ -123,9 +123,17 @@ class WalletController extends Controller
         }
     }
 
-    public function paymentHistory()
+    public function paymentHistory(Request $request)
     {
-        $histories = $this->walletService->userInwardHistory();
+        $userId = "";
+        if($request->filled('query')){
+            $validatedData = $request->validate([
+                'query' => 'required|string|max:50'
+            ]);
+            $userId = $this->userService->getUserByPhone_Username($validatedData['query'])['id'];
+        }
+
+        $histories = $this->walletService->userInwardHistory($userId);
         return view("main.payment-history", compact('histories'));
     }
 

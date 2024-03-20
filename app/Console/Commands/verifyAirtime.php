@@ -152,6 +152,9 @@ class verifyAirtime extends Command
                 $connectVendor = app(MobileNig::class);
                 $submitOrder = $connectVendor->processRequest($verifyData, $apiDetails);
             break;
+
+            default:
+                $submitOrder = false;
         }
         return $submitOrder;
     }

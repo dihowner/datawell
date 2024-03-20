@@ -6,7 +6,7 @@
         <div class="list-group list-group-transparent mb-0">
 
 
-            <a href="{{ route('user.data-menu') }}" class="list-group-item list-group-item-action d-flex align-items-center border-bottom fs-16">
+            <a href="{{ route('user.datamenu') }}" class="list-group-item list-group-item-action d-flex align-items-center border-bottom fs-16">
                 <i class="fe fe-wifi mr-2"></i> Buy Data
             </a>
 

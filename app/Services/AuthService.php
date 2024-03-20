@@ -10,7 +10,6 @@ use App\Models\PasswordReset;
 use App\Http\Traits\ResponseTrait;
 use App\Mail\VerifyRegistration as MailVerifyRegistration;
 use App\Models\VerifyRegistration;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -89,7 +88,6 @@ class AuthService  {
             return $this->sendError("Invalid verification code supplied", [], 400);
         }
         catch(Exception $e) {
-            Log::error($e->getMessage());
             return $this->sendError("Error creating user account", [], 400);
         }
     }
@@ -117,7 +115,6 @@ class AuthService  {
             }
         }
         catch(Exception $e) {
-            Log::error($e->getMessage());
             $this->responseBody = $this->sendError("Error creating user account", [], 400);
         }
         return $this->responseBody;
@@ -174,7 +171,6 @@ class AuthService  {
             }
         }
         catch(Exception $e) {
-            Log::error($e->getMessage());
             return $this->sendError("Unexpected error occurred", [], 400);
         }
     }
@@ -222,7 +218,6 @@ class AuthService  {
             return $this->sendResponse("Password updated successfully.", [], 200);
         }
         catch(Exception $e) {
-            Log::error($e->getMessage());
             return $this->sendError("Error updating user password", [], 400);
         }
     }
@@ -245,7 +240,6 @@ class AuthService  {
             return $this->sendResponse("Transaction pin set for subsequent transaction. Kindly keep safe", [], 200);
         }
         catch(Exception $e) {
-            Log::error($e->getMessage());
             return $this->sendError("Error updating transaction password", [], 400);
         }
     }

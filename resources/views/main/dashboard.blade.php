@@ -15,10 +15,20 @@
                     @include('components.main.topnav')
                     @include('components.main.breadcrumb')
 
+                    {{-- @if (session()->has('info')) --}}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-info p-3">
+                                {{-- {{ $totalPendingPayment }} --}}
+                                {{-- {{ session('info') }} --}}
+                            </div>
+                        </div>
+                    </div>
+                    {{-- @endif --}}
+
                     <div class="app-dashboard"></div>
 
-                    <div class="row">
-                    </div>
+                    <div class="row"></div>
                 </div>
             </div>
         </div>

@@ -26,6 +26,8 @@
                                 </div>
                                 <div class="card-body p-2">
 
+                                    @include('components.main.search')
+
                                     @if ($errors->any() || session()->has('error'))
                                         <div class="alert alert-danger" style="font-size: 18px">
                                             <ul>

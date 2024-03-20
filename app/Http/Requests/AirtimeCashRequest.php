@@ -28,7 +28,7 @@ class AirtimeCashRequest extends FormRequest
             "phone_number" => "string|required|min:11|max:11",
             "airtime_sender" => "string|required|min:11|max:11",
             "network" => "string|required",
-            "additional_note" => "string",
+            "additional_note" => "string|nullable",
         ];
     }
 

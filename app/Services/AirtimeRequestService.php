@@ -77,6 +77,7 @@ class AirtimeRequestService {
             $init_code = $requestData['init_code'];
             $wrap_code = $requestData['wrap_code'];
             $mobilenig = isset($requestData['mobilenig']) ? $requestData['mobilenig'] : NULL;
+            $smeplug = isset($requestData['smeplug']) ? $requestData['smeplug'] : NULL;
             
             $checkRequest = AirtimeRequest::where("id", $requestId)->first();
 
@@ -86,7 +87,7 @@ class AirtimeRequestService {
             
             AirtimeRequest::where('id', $requestId)->update([
                 "init_code" => $init_code, "wrap_code" => $wrap_code, 
-                "mobilenig" => $mobilenig
+                "mobilenig" => $mobilenig, "smeplug" => $smeplug
             ]);
             return $this->sendResponse("Airtime request updated successfully", [], 200);
         }

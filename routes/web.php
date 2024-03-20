@@ -123,6 +123,8 @@ Route::middleware(['auth'])->prefix('user')->group(function() {
     // Purchase of Service...
     Route::controller(PurchaseController::class)->group(function() {
         Route::get('/data-menu', 'dataMenu')->name('user.data-menu');
+        Route::get('/datamenu', 'dataMenus')->name('user.datamenu');
+        Route::get('/datamenu/{category}', 'fetchDataBundle')->name('user.fetchdata');
         Route::get('/electricity-menu', 'electricityMenu')->name('user.electricity-menu');
         Route::get('/cabletv-menu', 'cabletvMenu')->name('user.cabletv-menu');
 
@@ -177,7 +179,7 @@ Route::middleware(['auth'])->prefix('user')->group(function() {
         Route::get('/withdrawals', 'index')->name('user.withdrawals-history');
         Route::get('/convert-airtime-wallet', 'convertAirtimeWalletView')->name('user.convert-airtimewallet-view');
         Route::get('/withdrawals/{reference}', 'viewWithdrawal')->name('view-withdrawal');
-        Route::get('/withdrawals/search', 'searchUserWithdrawals')->name('user.search-transactions');
+        // Route::get('/withdrawals/search', 'searchUserWithdrawals')->name('user.search-transactions');
         
         Route::post('/convert-airtime-wallet', 'convertAirtimeWallet')->name('user.convert-airtime-wallet');
     });

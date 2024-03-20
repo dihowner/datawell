@@ -74,7 +74,8 @@ class AirtelDataDispatcher extends Command
                             "phone_number" => $destination,
                             "request_id" => $uniqueReference,
                             "provider_service_id" => $vendorRequest[$vendorCode],
-                            "category" => "data"
+                            "category" => "data",
+                            "ignoreCron" => true
                         ];
                         self::updateOrder($uniqueReference, self::sendToProvider($purchaseData, $theProductApi));          
                     }
@@ -86,7 +87,7 @@ class AirtelDataDispatcher extends Command
     private function updateOrder($reference, $providerResponse) {
         try {
             $decodeResponse = json_decode($providerResponse->getContent(), true)["data"];
-
+                
             if($providerResponse->getStatusCode() === 200) {
                 // decode the provider response...
                 $txStatus = $decodeResponse['delivery_status'];

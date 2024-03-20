@@ -83,7 +83,7 @@
                                                 <select class="form-control form-control-lg mb-4 funding_method"
                                                     name="funding_method">
                                                     <option value="">-- Select Method --</option>
-                                                    <option value="manual_funding">Bank Deposit (Transfer)</option>
+                                                    <option value="manual_funding">Bank Deposit (Transfer - No Charges)</option>
                                                     @if ($isflutterActive === 'active')
                                                         <option value="flutterwave">Flutterwave Online Payment</option>
                                                     @endif

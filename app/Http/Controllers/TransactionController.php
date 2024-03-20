@@ -36,7 +36,11 @@ class TransactionController extends Controller
 
     public function searchUserPurchaseHistory(Request $request) {
         try {
-            $searchValue = $request->input('query');
+            $validatedData = $request->validate([
+                'query' => 'required|string|max:50'
+            ]);
+
+            $searchValue = $validatedData['query'];
             $userId = Auth::id();
             $userPurchases = $this->transactService->userPurchaseHistory($userId, $searchValue);
             $userDetail = $this->userService->getUserById($userId);
@@ -78,7 +82,10 @@ class TransactionController extends Controller
         try {
             $searchValue = "";
             if($request->filled('query')){
-                $searchValue = $request->input('query');
+                $validatedData = $request->validate([
+                    'query' => 'required|string|max:50'
+                ]);
+                $searchValue = $validatedData['query'];
             }
 
             $userPurchases = $this->transactService->userPurchaseHistory("", $searchValue);

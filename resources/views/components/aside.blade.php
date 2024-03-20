@@ -61,7 +61,7 @@
         </li>
 
         <li class="slide mb-2">
-            <a href="{{ route('user.data-menu') }}" class="side-menu__item">
+            <a href="{{ route('user.datamenu') }}" class="side-menu__item">
                 <i class="fa fa-wifi"></i>
                 <span class="side-menu__label">Buy Data Bundle</span>
             </a>

@@ -15,14 +15,17 @@ use App\Http\Requests\ElectricityRequest;
 use App\Http\Requests\DataPurchaseRequest;
 use App\Http\Requests\ServiceVerifyRequest;
 use App\Http\Controllers\CategoryController;
+use App\Services\UtilityService;
 
 class PurchaseController extends Controller
 {
-    protected $userService, $productService, $categoryController, $purchaseService;
-    public function __construct(UserService $userService, ProductService $productService, CategoryController $categoryController, PurchaseService $purchaseService){
+    protected $userService, $productService, $categoryController, $purchaseService, $utilityService;
+    public function __construct(UserService $userService, ProductService $productService, CategoryController $categoryController, PurchaseService $purchaseService,
+                                 UtilityService $utilityService){
         $this->userService = $userService;
         $this->productService = $productService;
         $this->purchaseService = $purchaseService;
+        $this->utilityService = $utilityService;
         $this->categoryController = $categoryController;
     }
 
@@ -30,6 +33,40 @@ class PurchaseController extends Controller
     {
         $userDetail = $this->userService->getUserById(Auth::id());
         return view('private.data-menu', compact('userDetail'));
+    }
+
+    public function dataMenus()
+    {
+        $userDetail = $this->userService->getUserById(Auth::id());
+        $mtnDataCategories = $this->categoryController->getSubCategory('MTN Data Bundle');
+        $airtelDataCategories = $this->categoryController->getSubCategory('Airtel Data Bundle');
+        $gloDataCategories = $this->categoryController->getSubCategory('Glo Data Bundle');
+        
+        $allCatWithSub = $mtnDataCategories->merge($airtelDataCategories)->merge($gloDataCategories);
+        
+        $get9mobile = $this->categoryController->getCategory("Data Bundle");
+
+        $array1 = json_decode($allCatWithSub, true);
+        $array2 = json_decode($get9mobile, true);
+        
+        $dataCategories = collect(array_merge($array1, [$array2]));
+
+        $categoryWithImages = $dataCategories->map(function ($category) {
+            $categoryName = strtolower($category['category_name']) == 'data bundle' ? '9mobile' : $category['category_name'];
+            $category['image'] = $this->utilityService->getProductImage($categoryName);
+            return $category;
+        });
+        
+        return view('private.datamenu', compact('userDetail', 'categoryWithImages'));
+    }
+
+    public function fetchDataBundle($category) {
+        $category = str_replace("-" , " ", $category);
+        
+        $userDetail = $this->userService->getUserById(Auth::id());
+        $getDataVolumes = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], $category);
+        
+        return view('private.buy-data', compact('userDetail', 'getDataVolumes'));
     }
 
     public function electricityMenu()

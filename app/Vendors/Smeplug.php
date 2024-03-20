@@ -29,15 +29,14 @@ class Smeplug {
         switch($bodyRequest['category']) {
             case "airtime":
                 $requestPayload = [
-                    "service_id" => $bodyRequest["provider_service_id"],
-                    "trans_id"=> $bodyRequest["request_id"],
-                    "service_type"=> "STANDARD",
-                    "phoneNumber"=> $bodyRequest["phone_number"],
+                    "network_id" => self::getNetworkIdWithProductId($bodyRequest['product_id']),
+                    "customer_reference"=> $bodyRequest["request_id"],
+                    "phone"=> $bodyRequest["phone_number"],
                     "amount"=> $bodyRequest['amount'],
                 ];
-                    
-                $processOrder = HttpRequest::sendPost($this->endpoint, $requestPayload, $authHeader);
-                return $this->checkPurchaseResponse($processOrder->body());
+                $processOrder = HttpRequest::sendPost($this->endpoint.'airtime/purchase', $requestPayload, $authHeader);
+
+                return $this->checkPurchaseResponse($processOrder);
             break;
 
             case "data":
@@ -51,13 +50,13 @@ class Smeplug {
                 ];
 
                 $processOrder = HttpRequest::sendPost($this->endpoint.'data/purchase', $requestPayload, $authHeader);
-                return $this->checkPurchaseResponse($processOrder->body());
+                return $this->checkPurchaseResponse($processOrder);
             break;
             
             case "verifyorder":
                 $reference = $bodyRequest["request_id"];
                 $verifyOrder = self::verifyOrder($reference, $authHeader);
-                return self::checkPurchaseResponse($verifyOrder);
+                return $this->checkPurchaseResponse($verifyOrder);
             break;
         }
         
@@ -67,7 +66,7 @@ class Smeplug {
 
     private function checkPurchaseResponse($apiResponse) {
         try {
-            $decode_response = json_decode($apiResponse, true);
+            $decode_response = is_array($apiResponse) ? $apiResponse : json_decode($apiResponse, true);
             
             if(strtolower($decode_response['status']) == "success") {
                 $reformResponse = $decode_response;
@@ -84,7 +83,7 @@ class Smeplug {
             }
         }
         catch(Exception $e) {
-            return $e->getMessage();
+            return $this->sendError("Error", $e->getMessage(), 500);
         }
     }
 
@@ -99,7 +98,7 @@ class Smeplug {
         ];
         
         $fetchService = HttpRequest::sendGet($this->endpoint."data/plans", "", $authHeader);
-        return $fetchService->body();
+        return $fetchService;
     }
 
     private function getNetworkIdWithProductId($productId) {

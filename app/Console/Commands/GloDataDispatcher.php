@@ -74,9 +74,12 @@ class GloDataDispatcher extends Command
                             "phone_number" => $destination,
                             "request_id" => $uniqueReference,
                             "provider_service_id" => $vendorRequest[$vendorCode],
-                            "category" => "data"
+                            "category" => "data",
+                            "ignoreCron" => true,
                         ];
-                        self::updateOrder($uniqueReference, self::sendToProvider($purchaseData, $theProductApi));          
+                        $sendToProvider = self::sendToProvider($purchaseData, $theProductApi);
+                        Log::info($sendToProvider);
+                        self::updateOrder($uniqueReference, $sendToProvider);          
                     }
                 }
             }

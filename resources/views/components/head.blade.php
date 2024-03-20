@@ -8,6 +8,10 @@
     <meta content="Peak Infotech Systems" name="author">
     <meta name="keywords" content="data, recharge, mtn, cable, gotv, dstv, glo, airtel,bundle, offer" />
 
+    <meta property="og:title" content="Data Well Ng">
+    <meta property="og:description" content="DataWell - making data life affordable">
+    <meta property="og:image" content="https://datawellng.com/images/The%20Data%20Well%20logo%20oppo.png">
+
     <title>{{ $pageTitle }}</title>
     <!-- Bootstrap css -->
     <link href="{{ asset('assets/plugins/bootstrap/css/bootstrap.css') }}" rel="stylesheet" />

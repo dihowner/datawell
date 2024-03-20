@@ -57,6 +57,7 @@
                                                     <th>Init Code</th>
                                                     <th>Wrap Code</th>
                                                     <th>MobileNig</th>
+                                                    <th>Smeplug</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -73,6 +74,7 @@
                                                             $initCode = $airtimeRequest->init_code;
                                                             $wrapCode = $airtimeRequest->wrap_code;
                                                             $mobileNigCode = $airtimeRequest->mobilenig;
+                                                            $smePlugCode = $airtimeRequest->smeplug;
                                                         @endphp
                                                         <tr>
                                                             <td>{{ $i }}</td>
@@ -91,6 +93,7 @@
                                                             <td>{{ $initCode }} </td>
                                                             <td>{{ $wrapCode }} </td>
                                                             <td>{{ $mobileNigCode }} </td>
+                                                            <td>{{ $smePlugCode }} </td>
                                                             <td>
 
                                                                 <a href="javacript:void(0)" data-toggle="modal"
@@ -151,7 +154,7 @@
                                                                                         placeholder="Enter wrap code">
                                                                                 </div>
 
-                                                                                <div class="col-md-12 mb-2">
+                                                                                <div class="col-md-6 mb-2">
                                                                                     <label class="form-label">MobileNig
                                                                                         Code</label>
                                                                                     <input
@@ -159,6 +162,16 @@
                                                                                         name="mobilenig"
                                                                                         value="{{ $mobileNigCode }}"
                                                                                         placeholder="Enter mobilenig code">
+                                                                                </div>
+
+                                                                                <div class="col-md-6 mb-2">
+                                                                                    <label class="form-label">Smeplug
+                                                                                        Code</label>
+                                                                                    <input
+                                                                                        class="form-control form-control-lg"
+                                                                                        name="smeplug"
+                                                                                        value="{{ $smePlugCode }}"
+                                                                                        placeholder="Enter smeplug code">
                                                                                 </div>
 
                                                                             </div>

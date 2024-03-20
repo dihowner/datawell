@@ -13,6 +13,10 @@ class CategoryController extends Controller {
         $this->categoryService = $categoryService;
     }
 
+    public function getCategory($categoryName) {
+        return $this->categoryService->getCategoryByName($categoryName);
+    }
+
     public function getSubCategory($categoryName) {
         return $this->categoryService->getSubCategories($categoryName);
     }

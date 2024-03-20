@@ -55,7 +55,7 @@ class MobileNig {
                     ];
                         
                     $processOrder = HttpRequest::sendPost($this->endpoint, $requestPayload, $authHeader);
-                    return $this->checkPurchaseResponse($processOrder->body());
+                    return $this->checkPurchaseResponse($processOrder);
                 break;
     
                 case "data":
@@ -65,15 +65,13 @@ class MobileNig {
                         "service_id" => $serviceId,
                         "service_type" => $requestType,
                         "beneficiary"=> $bodyRequest["phone_number"],
-                        "trans_id"=> $bodyRequest["request_id"],
+                        // "trans_id"=> $bodyRequest["request_id"],
+                        "trans_id"=> mt_rand(11, 90) * mt_rand(1, 9),
                         "code"=> $bodyRequest["provider_service_id"],
                         "amount" => self::getPackagePrice($serviceId, $requestType, $bodyRequest["provider_service_id"], $apiDetails)
                     ];
-    
-                    // return $requestPayload;
-
                     $processOrder = HttpRequest::sendPost($this->endpoint, $requestPayload, $authHeader);
-                    return $this->checkPurchaseResponse($processOrder->body());
+                    return $this->checkPurchaseResponse($processOrder);
                 break;
     
                 case "verifycabletv":
@@ -91,7 +89,7 @@ class MobileNig {
                         $category = strtolower($bodyRequest["service"]);
                     }
                     $processOrder = HttpRequest::sendPost($this->endpoint."proxy", $requestPayload, $authHeader);
-                    return $this->checkVerificationResponse($processOrder->body(), $category);
+                    return $this->checkVerificationResponse($processOrder, $category);
                 break;
     
                 case "cabletv":
@@ -119,7 +117,7 @@ class MobileNig {
                     $requestPayload["customerNumber"] = isset($bodyRequest["customer_number"]) ? $bodyRequest["customer_number"]:$bodyRequest["smart_number"];
     
                     $processOrder = HttpRequest::sendPost($this->endpoint, $requestPayload, $authHeader);
-                    return $this->checkPurchaseResponse($processOrder->body());
+                    return $this->checkPurchaseResponse($processOrder);
                 break;
     
                 case "education":
@@ -130,7 +128,7 @@ class MobileNig {
                         "amount" => self::getPackagePrice($serviceId, "", "", $apiDetails)
                     ];
                     $processOrder = HttpRequest::sendPost($this->endpoint, $requestPayload, $authHeader);
-                    return $this->checkPurchaseResponse($processOrder->body());
+                    return $this->checkPurchaseResponse($processOrder);
                 break;
     
                 case "verifyelectricity":                    
@@ -142,7 +140,7 @@ class MobileNig {
                     ];
     
                     $processOrder = HttpRequest::sendPost($this->endpoint."proxy", $requestPayload, $authHeader);
-                    return $this->checkVerificationResponse($processOrder->body(), "electricity");
+                    return $this->checkVerificationResponse($processOrder, "electricity");
                 break;
     
                 case "electricity":
@@ -204,7 +202,7 @@ class MobileNig {
                     }
 
                     $processOrder = HttpRequest::sendPost($this->endpoint, $requestPayload, $authHeader);
-                    return $this->checkPurchaseResponse($processOrder->body());
+                    return $this->checkPurchaseResponse($processOrder);
     
                 break;
 
@@ -377,9 +375,9 @@ class MobileNig {
 
     private function getPackagePrice($serviceId, $requestType, $providerCode, $apiDetails) {
         $getAllPackage = self::getService($serviceId, $requestType, $apiDetails["api_public_key"]);
-
-        $decodeResponse = json_decode($getAllPackage, true);
-
+        // return gettype($getAllPackage);
+        // $decodeResponse = json_decode((string) $getAllPackage, true);
+        $decodeResponse = $getAllPackage;
         $allDetails = $decodeResponse['details'];
         $packagePrice = 0;
 
@@ -411,7 +409,8 @@ class MobileNig {
 
     private function checkPurchaseResponse($apiResponse) {
         try {
-            $decode_response = json_decode($apiResponse, true);
+            $decode_response = $apiResponse;
+            // $decode_response = json_decode($apiResponse, true);
 
             if($decode_response['statusCode'] == "200") {
                 $reformResponse = $decode_response;
@@ -458,7 +457,7 @@ class MobileNig {
             return $this->sendResponse("Success", $reformResponse, 200);
         }
         catch(Exception $e) {
-            return $e->getMessage();
+            return $this->sendError("Error", $e->getMessage(), 500);
         }
     }
 
@@ -617,7 +616,8 @@ class MobileNig {
         }
 
         $fetchService = HttpRequest::sendPost($this->endpoint."packages", $requestData, $authHeader);
-        return $fetchService->body();
+        return $fetchService;
+        return $fetchService;
     }
 
     private function isExemptService($service) {

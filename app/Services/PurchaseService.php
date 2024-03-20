@@ -513,8 +513,6 @@ class PurchaseService {
         // Send it to the provider...
         $sendToProvider = $this->sendToProvider($purchaseData, $theProductApi);
 
-        // return $sendToProvider;
-
         $transactionData["vendorRequest"] = $vendorRequest;
         $transactionData["purchase"] = $purchaseData;
         $transactionData["productInfo"] = $theProduct;

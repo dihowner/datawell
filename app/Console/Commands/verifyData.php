@@ -61,10 +61,15 @@ class verifyData extends Command
                     $verifyData = [
                         "request_id" => $reference,
                         "product_id" => $extraInfo['product'],
-                        "category" => "verifyorder"
+                        "category" => "verifyorder",
+                        "ignoreCron" => true
                     ];
+
+                    $response = self::sendToProvider($verifyData, $theProductApi);
+
+                    self::updateOrder($reference, $response);
                     
-                    self::updateOrder($reference, self::sendToProvider($verifyData, $theProductApi));
+                    // self::updateOrder($reference, self::sendToProvider($verifyData, $theProductApi));
                 }
             }
         }
@@ -72,6 +77,7 @@ class verifyData extends Command
 
     private function updateOrder($reference, $providerResponse) {
         $decodeResponse = json_decode($providerResponse->getContent(), true)["data"];
+        
         if(isset($decodeResponse["transaction_reference"])) {
             $transactReference = $decodeResponse["transaction_reference"];
         } else if(isset($decodeResponse["ref"])) {

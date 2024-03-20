@@ -5,13 +5,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/styles.css" />
-  <link <link href="https://cdn.rawgit.com/michalsnik/aos/2.3.4/dist/aos.css" rel="stylesheet" />
+  <link href="https://cdn.rawgit.com/michalsnik/aos/2.3.4/dist/aos.css" rel="stylesheet" />
   <link rel="stylesheet" href="node_modules/a11y-slider/dist/a11y-slider.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <link rel="stylesheet" href="//unpkg.com/a11y-slider@latest/dist/a11y-slider.css" />
   <link rel="icon" type="image/png" sizes="32x32" href="images/dwell-icon.png">
   <script src="node_modules/a11y-slider/dist/a11y-slider.js"></script>
   <title>Home | The Data Well Nigeria</title>
+  
+  <meta property="og:title" content="Data Well Ng">
+    <meta property="og:description" content="DataWell - making data life affordable">
+    <meta property="og:image" content="https://datawellng.com/images/The%20Data%20Well%20logo%20oppo.png">
+
+  
 </head>
 
 <body>
