@@ -80,6 +80,13 @@
                                                 <span class="d-block">{!! nl2br($bankAccountInformation) !!}</span>
                                             </div>
                                         @endif
+                                        
+                                        <a target="_blank"
+                                        href="https://api.whatsapp.com/send/?phone=%2B2347063420657&text=Hi Datawell, I just transferred {{ number_format($walletHistories->amount_vat_inclusive, 2) }} to your account to fund my wallet. Below is my receipt"
+                                         class="btn btn-info">
+                                            <i class="fa fa-whatsapp"></i> Notify Admin For Immediate Approval
+                                        </a>
+
                                         <a href="{{ route('user.fund-wallet-view') }}" class="btn btn-danger">
                                             <i class="fe fe-arrow-left-circle"></i> Go Back
                                         </a>

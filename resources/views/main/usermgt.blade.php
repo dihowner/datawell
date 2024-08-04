@@ -23,10 +23,29 @@
                                     <div class="mb-0">
                                         <h3 class="card-title mb-0">Users Management</h3>
                                     </div>
+
+                                    <div class="ml-auto mb-0">
+                                        <a class="btn btn-dark" href="{{ route('user-export-csv') }}">
+                                            <i class="fa fa-download"></i> <span> Export User</span>
+                                        </a>
+                                    </div>
                                 </div>
                                 <div class="card-body p-2">
 
                                     @include('components.main.search')
+
+                                    @if ($errors->any() || session()->has('error'))
+                                        <div class="alert alert-danger" style="font-size: 18px">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                                @if (session()->has('error'))
+                                                    <li>{{ session()->get('error') }}</li>
+                                                @endif
+                                            </ul>
+                                        </div>
+                                    @endif
 
                                     <div class="e-table">
                                         <div class="table-responsive table-lg mt-3">
@@ -50,6 +69,7 @@
                                                                 $userId = $user->id;
                                                                 $bankAccount = $monnifyInfo = false;
                                                                 $userMeta = $user->new_user_meta;
+                                                                $accessControl = json_decode($user->access_control);
                                                                 
                                                                 if ($userMeta !== false) {
                                                                     $monnifyInfo = isset($userMeta['monnify']) ? $userMeta['monnify'] : false;
@@ -134,6 +154,14 @@
                                                                         </a>
                                                                     @endif
 
+                                                                    @if ($accessControl->suspension->status == '0')
+                                                                        <a href="{{ route('update-user-access-control', ['id' => $userId, 'action' => 'suspend']) }}"
+                                                                            class="btn btn-primary" onclick="return confirm('Suspend user \n\n Action is irreversible')">Suspend</a>
+                                                                    @else
+                                                                        <a href="{{ route('update-user-access-control', ['id' => $userId, 'action' => 'unsuspend']) }}"
+                                                                            class="btn btn-info" onclick="return confirm('Unsuspend user \n\n Action is irreversible')">Unsuspend</a>
+                                                                    @endif
+
                                                                     <a href="javacript:void(0)" data-toggle="modal"
                                                                         data-target="#editProfile{{ $userId }}">
                                                                         <span class="btn btn-danger btn-sm">
@@ -167,34 +195,46 @@
                                                                                 </button>
                                                                             </div>
                                                                             <div class="modal-body">
-                                                                                <div class="form-group mb-2">
-                                                                                    <label for="serviceType"
-                                                                                        class="form-label">Transaction
-                                                                                        PIN</label>
-                                                                                    <input
-                                                                                        class="form-control form-control-lg"
-                                                                                        maxlength="4"
-                                                                                        name="transactpin"
-                                                                                        value="{{ $user->secret_pin }}"
-                                                                                        placeholder="Enter secret pin">
-                                                                                </div>
+                                                                                <div class="row">
 
-                                                                                <div class="form-group mb-2">
-                                                                                    <label for="serviceType"
-                                                                                        class="form-label">Plan</label>
-                                                                                    <select
-                                                                                        class="form-control form-control-lg"
-                                                                                        name="plan_id">
-                                                                                        @if (count($allPlans) > 0)
-                                                                                            @foreach ($allPlans as $plan)
-                                                                                                <option
-                                                                                                    value="{{ $plan->id }}"
-                                                                                                    <?php echo $plan['id'] === $user->plan_id ? 'selected' : ''; ?>>
-                                                                                                    {{ $plan->plan_name }}
-                                                                                                </option>
-                                                                                            @endforeach
-                                                                                        @endif
-                                                                                    </select>
+                                                                                    <div class="col-md-6 form-group mb-2">
+                                                                                        <label for="serviceType"
+                                                                                            class="form-label">Transaction
+                                                                                            PIN</label>
+                                                                                        <input
+                                                                                            class="form-control form-control-lg"
+                                                                                            maxlength="4"
+                                                                                            name="transactpin"
+                                                                                            value="{{ $user->secret_pin }}"
+                                                                                            placeholder="Enter secret pin">
+                                                                                    </div>
+    
+                                                                                    <div class="col-md-6 form-group mb-2">
+                                                                                        <label for="plan_id"
+                                                                                            class="form-label">Plan</label>
+                                                                                        <select
+                                                                                            class="form-control form-control-lg"
+                                                                                            name="plan_id">
+                                                                                            @if (count($allPlans) > 0)
+                                                                                                @foreach ($allPlans as $plan)
+                                                                                                    <option
+                                                                                                        value="{{ $plan->id }}"
+                                                                                                        <?php echo $plan['id'] === $user->plan_id ? 'selected' : ''; ?>>
+                                                                                                        {{ $plan->plan_name }}
+                                                                                                    </option>
+                                                                                                @endforeach
+                                                                                            @endif
+                                                                                        </select>
+                                                                                    </div>
+    
+                                                                                    <div class="col-md-12 form-group mb-2">
+                                                                                        <label for="vending_restriction"
+                                                                                            class="form-label">Vending Restriction</label>
+                                                                                        <select class="form-control" name="vending_restriction">
+                                                                                            <option value="restricted" {{ $accessControl->vending->status == "restricted" ? "selected='selected'" : "" }}>Allow User to buy with limit</option>
+                                                                                            <option value="offlimit" {{ $accessControl->vending->status == "offlimit" ? "selected='selected'" : "" }}> Allow User to buy without limit</option>
+                                                                                        </select>
+                                                                                    </div>
                                                                                 </div>
 
                                                                             </div>

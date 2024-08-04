@@ -24,7 +24,8 @@ class TransactRequest extends FormRequest
     public function rules()
     {
         return [
-            "pending_transact" => "array|required",
+            "pending_transact" => $this->has('pending_transact') ? "array|required" : "nullable",
+            "reference" => $this->has('reference') ? "array|required" : "nullable",
             "action" => "string|required"
         ];
     }

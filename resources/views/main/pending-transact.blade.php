@@ -79,7 +79,7 @@
                                                                         name="pending_transact[]"
                                                                         value="{{ $referenceId }}" />
                                                                 </td>
-                                                                <th scope="row">{{ $i }}</th>
+                                                                <td scope="row">{{ $i }}</td>
 
                                                                 <td class="align-middle">
                                                                     <div class="d-flex">

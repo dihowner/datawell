@@ -23,6 +23,12 @@
                                     <div class="mb-0">
                                         <h3 class="card-title mb-0">Users List</h3>
                                     </div>
+
+                                    <div class="ml-auto mb-0">
+                                        <a class="btn btn-dark" href="{{ route('user-export-csv') }}">
+                                            <i class="fa fa-download"></i> <span> Export User</span>
+                                        </a>
+                                    </div>
                                 </div>
                                 <div class="card-body p-2">
 

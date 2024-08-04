@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ee7a303c5f5779bd59860adf726deb14",
+    "content-hash": "f7154c9905bdc74409bfbca823894d23",
     "packages": [
         {
             "name": "brick/math",
@@ -2937,21 +2937,21 @@
         },
         {
             "name": "realrashid/sweet-alert",
-            "version": "v5.1.0",
+            "version": "v7.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/realrashid/sweet-alert.git",
-                "reference": "fb837beaa52568fb3106d311ff3c7a7b8e543608"
+                "reference": "7890f3d3a0f45ea65b90300a823681a99a1d2dd6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/realrashid/sweet-alert/zipball/fb837beaa52568fb3106d311ff3c7a7b8e543608",
-                "reference": "fb837beaa52568fb3106d311ff3c7a7b8e543608",
+                "url": "https://api.github.com/repos/realrashid/sweet-alert/zipball/7890f3d3a0f45ea65b90300a823681a99a1d2dd6",
+                "reference": "7890f3d3a0f45ea65b90300a823681a99a1d2dd6",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^5.6|^6.0|^7.0|^8.0|^9.0|^9.11|9.14.*",
-                "php": "^7.2|^8.0"
+                "laravel/framework": "^5.6|^6.0|^7.0|^8.0|^9.0|^9.11|9.14.*|^10.0|^11.0",
+                "php": "^7.2|^8.0|^8.1|^8.2|^8.3"
             },
             "require-dev": {
                 "symfony/thanks": "^1.0"
@@ -2987,7 +2987,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "A BEAUTIFUL, RESPONSIVE, CUSTOMIZABLE, ACCESSIBLE (WAI-ARIA) REPLACEMENT FOR JAVASCRIPT'S POPUP BOXES FOR LARAVEL BY RASHID ALI",
+            "description": "Laravel Sweet Alert Is A Package For Laravel Provides An Easy Way To Display Alert Messages Using The SweetAlert2 Library.",
             "homepage": "https://github.com/realrashid/sweet-alert",
             "keywords": [
                 "alert",
@@ -3023,7 +3023,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-28T13:28:03+00:00"
+            "time": "2024-06-15T16:17:23+00:00"
         },
         {
             "name": "symfony/console",

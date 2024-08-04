@@ -26,12 +26,13 @@ class EditUserByAdminRequest extends FormRequest
         return [
             "id" => ["integer", $this->route('id') != null ? 'required' : 'nullable'],
             "plan_id" => "required|integer",
+            "vending_restriction" => "required|string",
             "transactpin" =>  [
                 'required',
                 'string',
                 'min:4',
                 'max:4',
-                'not_in:0000',
+                // 'not_in:0000',
             ]
         ];
     }
@@ -39,6 +40,7 @@ class EditUserByAdminRequest extends FormRequest
     public function message() {
         return [
             "plan_id.required" => "New plan is required",
+            "transactpin.string" => "Transaction pin must be a string",
             "transactpin.min" => "Transaction pin must not be lesser than :min digit",
             "transactpin.max" => "Transaction pin must not be greater than :max digit",
             "transactpin.not_in" => "Transaction pin  must not be the default PIN of 0000"

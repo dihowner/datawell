@@ -23,6 +23,7 @@ class SettingsRequest extends FormRequest
      */
     public function rules()
     {
+        // dd($this->has('updateKycCharge'));
         if($this->has('updateMonnify')) { // Updating of monnify settings...
             return [
                 "apiKey" => "required|string",
@@ -57,6 +58,12 @@ class SettingsRequest extends FormRequest
                 "max_value" => "required|numeric"
             ];
         }
+        else if($this->has('updateVendRestriction')) { // Updating of vending restriction settings...
+            return [
+                "unverified_purchase" => "required|numeric",
+                "status" => "required|string"
+            ];
+        }
         else if($this->has('updateAiritmeConversion')) { // Updating of bank account and charges settings...
             return [
                 "mtn_receiver" => "required|digits_between:11,11",
@@ -74,6 +81,12 @@ class SettingsRequest extends FormRequest
                 "airtelStatus" => $this->has('airtelStatus') ? "required|string":"",
                 "gloStatus" => $this->has('gloStatus') ? "required|string":"",
                 "etiStatus" => $this->has('etiStatus') ? "required|string":"",
+            ];
+        }
+        else if($this->has('updateKycCharge')) { // Updating of bank account and charges settings...
+            return [
+                "nin" => "required|numeric",
+                "bvn" => "required|numeric"
             ];
         }
     }

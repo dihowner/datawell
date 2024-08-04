@@ -65,7 +65,7 @@ class TransactionController extends Controller
             
             $userId = Auth::id();
             $userDetail = $this->userService->getUserById($userId);
-            $txnRecord = $this->transactService->viewTransaction($userId, $reference);
+            $txnRecord = $this->transactService->getTransaction($userId, $reference);
             
             if($txnRecord === false) {
                 Alert::error("Error", "Transaction record not found. Kindly inform Admin");
@@ -154,13 +154,10 @@ class TransactionController extends Controller
 
     public function ProcessTransaction(TransactRequest $request) {
         $processData = $request->validated();
-        $transIDs = $processData['pending_transact'];
+        $transIDs = $processData['pending_transact'] ?? $processData['reference'];
         $action = $processData['action'];
 
         $processTxn = $this->transactService->processTransaction($action, $transIDs);
-
-        // return $processTxn;
-
         $responseCode = $processTxn->getStatusCode();
         $responseContent = json_decode($processTxn->content(), true);
 
@@ -173,4 +170,21 @@ class TransactionController extends Controller
         return redirect()->back();
     }
     
+    public function modifyStatusView() {
+        $userPurchases = null;
+        return view('main.modify-status', compact('userPurchases'));
+    }
+
+    public function searchOrderModify(Request $request) {
+        $reference = $request->input('query');
+        $status = $request->input('status') ?? '';
+        
+        $getTransaction = $this->transactService->getMultipleTransactions($reference, $status);
+        if (!$getTransaction) {
+            Alert::error("Error", "Transaction record not found. Kindly provide valid reference");
+            return redirect()->back();
+        }
+        $userPurchases = $getTransaction;
+        return view('main.modify-status', compact('userPurchases'));   
+    }
 }

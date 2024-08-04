@@ -10,6 +10,8 @@ use RealRashid\SweetAlert\Facades\Alert;
 use App\Http\Requests\BankAccountRequest;
 use App\Http\Requests\PlanUpgradeRequest;
 use App\Http\Requests\EditUserByAdminRequest;
+use App\Models\User;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -38,6 +40,7 @@ class UserController extends Controller
         $userId = $userId != "" ? $userId : Auth::id();
 
         $generateAccount = $this->userService->GenerateUserVirtualAccount($userId);
+        // return $generateAccount;
         $responseCode = $generateAccount->getStatusCode();
 
         $responseContent = json_decode($generateAccount->content());
@@ -132,6 +135,66 @@ class UserController extends Controller
             Alert::error("Error", "Error processing request");
         }
         return redirect()->back();
+    }
+
+    public function updateUserAccessControl($id, $action) {
+        $updateUser = $this->userService->updateUserAccessControl($id, $action);
+        $responseCode = $updateUser->getStatusCode();
+        $responseContent = json_decode($updateUser->content());
+        $message = $responseContent->message;
+        if($responseCode === 200) {
+            Alert::success("Success", $message);
+        } else {
+            Alert::error("Error", $message);
+        }
+        return redirect()->back();
+    }
+
+    public function exportUserCSV() {
+        $todatsDate = Carbon::now();
+        $filename = 'datawell-users-'.$todatsDate.'.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+        
+        return response()->stream(function () {
+            $handle = fopen('php://output', 'w');
+    
+            // Add CSV headers
+            fputcsv($handle, [
+                'First Name',
+                'Last Name',
+                'Email',
+                'Phone Number'
+            ]);
+    
+             // Fetch and process data in chunks
+            User::chunk(5000, function ($users) use ($handle) {
+                foreach ($users as $user) {
+                    $fullname = explode(" ", $user['fullname']);
+                    $first_name = $fullname[0];
+                    $last_name = !empty($fullname[1]) ? $fullname[1] : '';
+                    // Extract data from each user.
+                    $data = [
+                        $first_name,
+                        $last_name,
+                        $user['emailaddress'],
+                        $user['phone_number']
+                    ];
+    
+                    // Write data to a CSV file.
+                    fputcsv($handle, $data);
+                }
+            });
+    
+            // Close CSV file handle
+            fclose($handle);
+        }, 200, $headers);
     }
 
 }

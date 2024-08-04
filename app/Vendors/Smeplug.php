@@ -4,7 +4,6 @@ namespace App\Vendors;
 use Exception;
 use App\Classes\HttpRequest;
 use App\Http\Traits\ResponseTrait;
-use Illuminate\Support\Facades\Log;
 
 /**
  * This class is written based on the documentation provided by the provider.
@@ -35,7 +34,7 @@ class Smeplug {
                     "amount"=> $bodyRequest['amount'],
                 ];
                 $processOrder = HttpRequest::sendPost($this->endpoint.'airtime/purchase', $requestPayload, $authHeader);
-
+                
                 return $this->checkPurchaseResponse($processOrder);
             break;
 
@@ -68,17 +67,25 @@ class Smeplug {
         try {
             $decode_response = is_array($apiResponse) ? $apiResponse : json_decode($apiResponse, true);
             
-            if(strtolower($decode_response['status']) == "success") {
-                $reformResponse = $decode_response;
-                $reformResponse['delivery_status'] = "1";
-                return $this->sendResponse("Success", $reformResponse, 200);
-            }
-            else if(strtolower($decode_response['status']) == "pending" OR $decode_response['status'] === true) {
-                $reformResponse = $decode_response;
-                $reformResponse['delivery_status'] = "2";
-                return $this->sendResponse("Success", $reformResponse, 200);
+            $orderStatus = $decode_response['status'];
+            if ($orderStatus === true) {
+                if(strtolower($orderStatus) == "pending") {
+                    $reformResponse = $decode_response;
+                    $reformResponse['delivery_status'] = "2";
+                    return $this->sendResponse("Success", $reformResponse, 200);
+                }
+                else {
+                    $reformResponse = $decode_response;
+                    $reformResponse['delivery_status'] = "1";
+                    return $this->sendResponse("Success", $reformResponse, 200);
+                }
             }
             else {
+                $decodeMsg = $decode_response['msg'] ?? "Unknown error. Please try again, or contact support if the error persists.";
+                if (str_contains(strtolower($decodeMsg), "is lower") OR str_contains(strtolower($decodeMsg), "minimum") 
+                    OR str_contains(strtolower($decodeMsg), "nin") OR str_contains(strtolower($decodeMsg), "barred")) {
+                    return $this->sendError("Error", $decodeMsg, 400);
+                }
                 return $this->sendError("Error", $decode_response, 400);
             }
         }

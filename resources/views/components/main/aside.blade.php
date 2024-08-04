@@ -100,6 +100,7 @@
                     <li><a class="slide-item"  href="{{ route('admin-pending-transactions-histories') }}"><span>Pending Delivery History</span></a></li>
                     <li><a class="slide-item"  href="{{ route('admin-successful-transactions-histories') }}"><span>Successful Transaction History</span></a></li>
                     <li><a class="slide-item"  href="{{ route('admin-awaiting-transactions-histories') }}"><span>Processed Delivery History</span></a></li>
+                    <li><a class="slide-item"  href="{{ route('admin-modify-status') }}"><span>Modify Transaction Status</span></a></li>
                 </ul>
             </li>
     

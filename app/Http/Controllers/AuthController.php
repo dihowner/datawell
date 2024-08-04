@@ -97,7 +97,7 @@ class AuthController extends Controller
         }
         else {
             Alert::error('Error', $message);
-            return redirect()->back();
+            return redirect()->back()->withInput();
         }
     }
 

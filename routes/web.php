@@ -1,7 +1,9 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PlansController;
 use App\Http\Controllers\WalletController;
@@ -226,6 +228,18 @@ Route::prefix('webhook')->group(function () {
 Route::controller(TestController::class)->prefix('test')->group(function () {
     Route::get('mobilenig', 'fetchService');
     Route::get('smeplug/data', 'fetchSmeplugDataService');
+});
+
+Route::get('/run-cron', function (Request $request) {
+    Artisan::call('airtime:dispatcher');
+    Artisan::call('airteldata:dispatcher');
+    Artisan::call('etisalatdata:dispatcher');
+    Artisan::call('glodata:dispatcher');
+    Artisan::call('mtndata:dispatcher');
+    Artisan::call('verify:airtime');
+    Artisan::call('verify:data');
+
+    return 'Cron job executed!';
 });
 
 // Admin Routing...

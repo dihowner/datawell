@@ -10,6 +10,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/dwell-icon.png') }}">
     <title>Login | DataWell</title>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TWDD5QXSNT">
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TWDD5QXSNT');
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TWDD5QXSNT">
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TWDD5QXSNT');
+</script>
 </head>
 
 <body>
@@ -69,16 +89,29 @@
                                 placeholder="Enter your password"
                                 class="bg-gray-100 fs-5 form-control w-100 px-2 py-2 placeholder:text-sm rounded-2xl border border-black focus:outline-none focus:border-blue-500 focus:border-b password" />
                         </div>
-                    </div>
-                    <a href="{{ route('forgot-password-form') }}" style="font-size: 18px"
-                        class="flex text-gray-700 normal-case css-1ujsas3">
-                        Forgot your password?<span class="MuiTouchRipple-root css-w0pj6f"></span></a>
+                    </div>                    
+                        
+                        <div class="w-100">
+                            <label class="fw-bold fs-lg-5 text-secondary" data-shrink="false" for=":rn:"
+                                id=":rn:-label">
+                                <input type="checkbox" /> Remember Me
+                            </label>
+                        </div>
+
                     <button
                         class="px-8 py-2 mt-8 text-sm font-bold text-white rounded-full lg:mt-12 lg:py-4 border lg:text-base lg:px-20 bg-[#D10A22] transition-all duration-500 delay-300 hover:text-[#D10A22] css-1eqycna loginMember"
                         tabindex="0" type="submit">
                         Sign in<span class=""></span>
                     </button>
                 </form>
+
+                <hr>
+                
+                <a href="{{ route('forgot-password-form') }}" style="font-size: 18px"
+                class="flex text-gray-700 normal-case css-1ujsas3">
+                Forgot your password?<span class="MuiTouchRipple-root css-w0pj6f"></span></a>
+
+
                 <p class="mt-4 text-gray-700 lg:hidden" style="font-size: 18px">
                     You don't have an account? <a href="{{ route('get.register') }}"><button
                             class="normal-case text-[#D10A22] css-1ujsas3" tabindex="0" type="button">

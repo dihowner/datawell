@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Exception;
+use App\Vendors\Smeplug;
 use App\Models\WalletOut;
 use App\Vendors\MobileNig;
 use App\Models\Transaction;
@@ -77,83 +78,97 @@ class EtisalatDataDispatcher extends Command
                             "category" => "data",
                             "ignoreCron" => true
                         ];
-                        self::updateOrder($uniqueReference, self::sendToProvider($purchaseData, $theProductApi));          
+                        self::updateOrder($uniqueReference, self::sendToProvider($purchaseData, $theProductApi), $vendorCode);          
                     }
                 }
             }
         }
     }
 
-    private function updateOrder($reference, $providerResponse) {
-        try {
-            $decodeResponse = json_decode($providerResponse->getContent(), true)["data"];
-
-            if($providerResponse->getStatusCode() === 200) {
-                // decode the provider response...
-                $txStatus = $decodeResponse['delivery_status'];
+    private function updateOrder($reference, $providerResponse, $vendorCode) {
+        DB::transaction(function () use ($reference, $providerResponse, $vendorCode) {
+            try {
+                $decodedResponse = json_decode($providerResponse->getContent(), true)["data"];
                 
-                Transaction::where(['status' => '0', 'reference' => $reference])->update(["status" => $txStatus, "response" => json_encode($decodeResponse)]);
-                WalletOut::where(['status' => '0', 'reference' => $reference])->update(["status" => $txStatus]);
-            } else {
-                // Let's find the transaction and perform a refund if it fails...
-                $findTxn = Transaction::where(['status' => '0', 'reference' => $reference])->first();
-
-                if($findTxn) {
-                    $extraInfo = json_decode($findTxn['extra_info'], true);
-                    $description = "Refund of ".strtoupper($extraInfo['network']). " N".$extraInfo['amount']. " for ".$extraInfo['destination'];
-                    $amountCharged = $findTxn->amount;
-                    $userId = $findTxn->user_id;
-        
-                    $currentBalance = $this->walletService->getUserBalance($userId);
-                    $newBalance = (float) $currentBalance + $amountCharged;
-        
-                    DB::beginTransaction();
-                    $inwardData = [
-                        "user_id" => $userId,
-                        "description" => $description,
-                        "old_balance" => $currentBalance,
-                        "amount" => $amountCharged,
-                        "new_balance" => $newBalance,
-                        "reference" => $reference,
-                        "status" => '3',
-                        'remark' => json_encode(['approved_by' => 'System Refund'])
-                    ];
-
-                    Transaction::create([
-                        "user_id" => $userId,
-                        "plan" => $findTxn->plan,
-                        "description" => $description,
-                        "destination" => $findTxn->destination,
-                        "old_balance" => $currentBalance,
-                        "amount" => $amountCharged,
-                        "new_balance" => $newBalance,
-                        "costprice" => $amountCharged,
-                        "category" => $findTxn->category,
-                        "reference" => $findTxn->reference,
-                        "response" => "Wallet Refunded",
-                        "status" => "4",
-                        "channel" => "website",
-                        "api_id" => $findTxn->api_id
+                if ($providerResponse->getStatusCode() === 200) {
+                    // Update transaction and wallet status on successful response
+                    $txStatus = $decodedResponse['delivery_status'];
+                    Transaction::where(['status' => '0', 'reference' => $reference])->update([
+                        "status" => $txStatus, 
+                        "response" => json_encode($decodedResponse)
                     ]);
-                    
-                    $this->walletService->createWallet('inward', $inwardData);
-                    $findTxn->status = '3';
-                    $findTxn->response = $decodeResponse;
-                    $findTxn->save(); 
-                    WalletOut::where(['status' => '0', 'reference' => $reference])->update(["status" => "3"]);
-                    DB::commit();
-                    return;
+                    WalletOut::where(['status' => '0', 'reference' => $reference])->update([
+                        "status" => $txStatus
+                    ]);
+                } else {
+                    // Handle failed transaction by performing a refund
+                    $transaction = Transaction::where(['status' => '0', 'reference' => $reference])->first();
+    
+                    if ($transaction) {
+                        if ($vendorCode != 'mobilenig') {
+                            $extraInfo = json_decode($transaction['extra_info'], true);
+                            $description = "Refund of " . strtoupper($extraInfo['network']) . " N" . $extraInfo['amount'] . " for " . $extraInfo['destination'];
+                            $amountCharged = $transaction->amount;
+                            $userId = $transaction->user_id;
+        
+                            $currentBalance = $this->walletService->getUserBalance($userId);
+                            $newBalance = (float)$currentBalance + $amountCharged;
+        
+                            $inwardData = [
+                                "user_id" => $userId,
+                                "description" => $description,
+                                "old_balance" => $currentBalance,
+                                "amount" => $amountCharged,
+                                "new_balance" => $newBalance,
+                                "reference" => $reference,
+                                "status" => '3',
+                                'remark' => json_encode(['approved_by' => 'System Refund'])
+                            ];
+        
+                            // Create refund transaction
+                            Transaction::create([
+                                "user_id" => $userId,
+                                "plan" => $transaction->plan,
+                                "description" => $description,
+                                "destination" => $transaction->destination,
+                                "old_balance" => $currentBalance,
+                                "amount" => $amountCharged,
+                                "new_balance" => $newBalance,
+                                "costprice" => $amountCharged,
+                                "category" => $transaction->category,
+                                "reference" => $transaction->reference,
+                                "response" => "Wallet Refunded",
+                                "status" => "4",
+                                "channel" => "website",
+                                "api_id" => $transaction->api_id
+                            ]);
+        
+                            $this->walletService->createWallet('inward', $inwardData);
+                            
+                            // Update the original transaction and wallet out status
+                            $transaction->update([
+                                "status" => '3',
+                                "response" => json_encode($decodedResponse)
+                            ]);
+                            WalletOut::where(['status' => '0', 'reference' => $reference])->update(["status" => "3"]);
+                        } else {
+                            Transaction::where(['status' => '0', 'reference' => $reference])->update([
+                                "status" => '2', 
+                                "response" => json_encode($decodedResponse)
+                            ]);
+                            WalletOut::where(['status' => '0', 'reference' => $reference])->update([
+                                "status" => '2'
+                            ]);
+                        }
+                    } else {
+                        Log::channel('daily')->info("Reference ($reference) not found");
+                    }
                 }
-
-                DB::rollBack();
-                Log::channel('daily')->info($reference ." => Reference ($reference) not found");
-                return;
+            } catch (Exception $e) {
+                Log::channel('daily')->error("Error updating order for reference ($reference): " . $e->getMessage());
+                throw $e;
             }
-        }
-        catch(Exception $e) {
-            DB::rollBack();
-            Log::channel('daily')->info($e->getMessage());
-        }
+        });
     }
     
     // Let's send the request to the provider
@@ -164,6 +179,12 @@ class EtisalatDataDispatcher extends Command
             case "mobilenig":
                 // Let's prepare some key info about the delivery of the order...
                 $connectVendor = app(MobileNig::class);
+                $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
+            break;
+            
+            case "smeplug":
+                // Let's prepare some key info about the delivery of the order...
+                $connectVendor = app(Smeplug::class);
                 $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
             break;
         }

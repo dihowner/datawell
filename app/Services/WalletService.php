@@ -369,7 +369,7 @@ class WalletService {
 
     public function userInwardHistory($userId = "", $dateFrom = "", $dateTo = "") {
     
-        $query = WalletIn::whereNotNull('user_id')->limit(100)->orderByDesc('created_at');
+        $query = WalletIn::whereNotNull('user_id')->orderByDesc('created_at');
         
         if (!empty($userId)) {
             $query->where('user_id', $userId);

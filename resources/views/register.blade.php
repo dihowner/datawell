@@ -59,7 +59,7 @@
                             <label class="fw-bold fs-lg-5 text-secondary" data-shrink="false">Username
                             </label>
                             <div class="w-100">
-                                <input aria-invalid="false" placeholder="Your username" name="username"
+                                <input aria-invalid="false" placeholder="Your username" name="username" value="{{ old('username') }}"
                                     class="bg-gray-100 form-control text-sm w-100 px-2 py-2 border border-black focus:outline-none focus:border-blue-500 focus:border-b" />
                             </div>
                         </div>
@@ -67,7 +67,7 @@
                             <label class="fw-bold fs-lg-5 text-secondary" data-shrink="false">Full Name
                             </label>
                             <div class="w-100">
-                                <input aria-invalid="false" placeholder="Your full name" name="fullname" type="text"
+                                <input aria-invalid="false" placeholder="Your full name" name="fullname" type="text" value="{{ old('fullname') }}"
                                     class="bg-gray-100 form-control text-sm w-100 px-2 py-2 border border-black focus:outline-none focus:border-blue-500 focus:border-b" />
                             </div>
                         </div>
@@ -75,7 +75,7 @@
                             <label class="fw-bold fs-lg-5 text-secondary" data-shrink="false">
                                 Email Address</label>
                             <div class="w-100">
-                                <input aria-invalid="false" placeholder="Valid email address" name="emailaddress"
+                                <input aria-invalid="false" placeholder="Valid email address" name="emailaddress" value="{{ old('emailaddress') }}"
                                     type="email"
                                     class="bg-gray-100 form-control text-sm w-100 px-2 py-2 border border-black focus:outline-none focus:border-blue-500 focus:border-b" />
                             </div>
@@ -85,7 +85,7 @@
                                 Phone Number</label>
                             <div class="w-100">
                                 <input aria-invalid="false" placeholder="Enter your valid mobile number"
-                                    name="phone_number" maxlength="11" minlength="11"
+                                    name="phone_number" maxlength="11" minlength="11" value="{{ old('phone_number') }}"
                                     class="bg-gray-100 form-control text-sm w-100 px-2 py-2 border border-black focus:outline-none focus:border-blue-500 focus:border-b" />
                             </div>
                         </div>
@@ -98,7 +98,13 @@
                                     class="bg-gray-100 text-sm form-control w-100 px-2 py-2 placeholder:text-sm rounded-2xl border border-black focus:outline-none focus:border-blue-500 focus:border-b" />
                             </div>
                         </div>
-
+                        
+                        <div class="w-100">
+                            <label class="fw-bold fs-lg-5 text-secondary">
+                                <input type="checkbox" required/> I have read and agreed to <em>Datawell NG</em> terms and conditions
+                            </label>
+                        </div>
+                        
                         <button
                             class="px-8 py-2 mt-8 text-sm font-bold text-white rounded-full lg:mt-12 lg:py-4 border lg:text-base lg:px-20 bg-[#D10A22] transition-all duration-500 delay-300 hover:text-[#D10A22] css-1eqycna loginMember"
                             tabindex="0" type="submit">

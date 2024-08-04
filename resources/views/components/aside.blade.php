@@ -132,6 +132,7 @@
             </a>
             <ul class="slide-menu">
                 <li><a class="slide-item" href="{{ route('user.profile') }}"><span>My Profile</span></a></li>
+                {{-- <li><a class="slide-item" href="{{ route('user.profile') }}"><span>My Profile</span></a></li> --}}
                 <li><a class="slide-item" href="{{ route('user.pin-password-view') }}"><span>Change Pin /
                             Password</span></a></li>
                 <li><a class="slide-item" href="{{ route('user.bank-account') }}"><span>Bank Account</span></a></li>

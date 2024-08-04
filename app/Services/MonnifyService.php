@@ -55,8 +55,8 @@ class MonnifyService extends UserService {
                 "Content-Type" => "application/json"
             ]);
 
-            $accessToken = json_decode((string) $result);
-            $bearerToken = isset($accessToken->responseBody->accessToken) ? $accessToken->responseBody->accessToken : false;
+            // $accessToken = json_decode((string) $result);
+            $bearerToken = isset($result['responseBody']['accessToken']) ? $result['responseBody']['accessToken'] : false;
             $this->responseBody = $bearerToken;
         } catch (RequestException $e) {
             // Handle request exceptions (e.g. 4xx, 5xx status codes)
@@ -98,7 +98,7 @@ class MonnifyService extends UserService {
                 "Content-Type" => "application/json"
             ]);
 
-            $decodeReserve = json_decode((string) $reserveResult, true);
+            $decodeReserve = is_array($reserveResult) ? $reserveResult : json_decode((string) $reserveResult, true);
 
             $getAccount = isset($decodeReserve['responseBody']['accounts']) ? $decodeReserve['responseBody']['accounts'] : false;
             if($getAccount !== false) {

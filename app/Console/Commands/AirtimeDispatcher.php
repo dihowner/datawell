@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Exception;
+use App\Vendors\Smeplug;
 use App\Models\WalletOut;
 use App\Vendors\MobileNig;
 use App\Models\Transaction;
@@ -173,6 +174,12 @@ class AirtimeDispatcher extends Command
             case "mobilenig":
                 // Let's prepare some key info about the delivery of the order...
                 $connectVendor = app(MobileNig::class);
+                $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
+            break;
+            
+            case "smeplug":
+                // Let's prepare some key info about the delivery of the order...
+                $connectVendor = app(Smeplug::class);
                 $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
             break;
         }

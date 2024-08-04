@@ -80,6 +80,22 @@ class UtilityService extends SettingsService {
         return $flutterInfo;
     }
 
+    public static function kycCharges() {
+        $settingsService = app(SettingsService::class);
+
+        $allSettings = $settingsService->getAllSettings();
+        $kycChargeInfo = isset($allSettings->kycCharges) ? $allSettings->kycCharges : false;
+        return $kycChargeInfo;
+    }
+
+    public static function vendingRestriction() {
+        $settingsService = app(SettingsService::class);
+
+        $allSettings = $settingsService->getAllSettings();
+        $restrictionInfo = isset($allSettings->vending_restriction) ? $allSettings->vending_restriction : false;
+        return $restrictionInfo;
+    }
+
     public static function paystackInfo() {
         $settingsService = app(SettingsService::class);
 

@@ -2,16 +2,19 @@
 namespace App\Services;
 
 use Exception;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Vendors\Smeplug;
 use App\Vendors\MobileNig;
+use App\Models\Transaction;
 use App\Vendors\LocalServer;
 use App\Services\WalletService;
 use App\Services\UtilityService;
-use App\Services\TransactionService;
-use App\Services\ProductPricingService;
 use App\Http\Traits\ResponseTrait;
-use App\Vendors\Smeplug;
 use Illuminate\Support\Facades\DB;
+use App\Services\TransactionService;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ProductPricingService;
 
 class PurchaseService {
     use ResponseTrait;
@@ -77,6 +80,11 @@ class PurchaseService {
             $theUser = Auth::user();
             $theUserId = $theUser["id"];
             $theUserPlanId = $theUser["plan_id"];
+            $vendingRestriction = json_decode($this->utilityService->vendingRestriction(), true);
+            $totalPurchase = self::getUserTotalPurchase($theUserId);
+            $theUserAccessControl = json_decode($theUser["access_control"], true);
+            $theUserVendingStatus = $theUserAccessControl['vending']['status'];
+            $theUserSuspensionStatus = $theUserAccessControl['suspension']['status'];
 
             if($theUser["secret_pin"] != $transactPin) {
                 return $this->sendError("Incorrect transaction pin supplied", [], 400);
@@ -92,6 +100,18 @@ class PurchaseService {
 
             if($currentUserBalance < $sellingPrice) {
                 return $this->sendError("Insufficient wallet balance. Kindly topup your wallet to complete your request", [], 400);
+            }
+
+            $unverifiedPurchaseBlc = (float) ($vendingRestriction["unverified_purchase"] - $totalPurchase);
+
+            if ($theUserVendingStatus != "offlimit" AND $vendingRestriction['status'] == 'enable' AND $unverifiedPurchaseBlc < $sellingPrice) {
+                $theUserAccessControl['suspension'] = ['status' => '1', 'date' => Carbon::now()];
+                User::where(['id' => $theUserId])->update(['access_control' => json_encode($theUserAccessControl)]);
+                return $this->sendError("You are unverified to perform such transaction. Kindly notify Admin", [], 400);
+            }
+
+            if ($theUserSuspensionStatus == "1") {
+                return $this->sendError("You are currently suspended from making purchase. Kindly notify Admin", [], 400);
             }
 
             // Send this to provider...
@@ -189,6 +209,11 @@ class PurchaseService {
             $theUser = Auth::user();
             $theUserId = $theUser["id"];
             $theUserPlanId = $theUser["plan_id"];
+            $vendingRestriction = json_decode($this->utilityService->vendingRestriction(), true);
+            $totalPurchase = self::getUserTotalPurchase($theUserId);
+            $theUserAccessControl = json_decode($theUser["access_control"], true);
+            $theUserVendingStatus = $theUserAccessControl['vending']['status'];
+            $theUserSuspensionStatus = $theUserAccessControl['suspension']['status'];
 
             if($theUser["secret_pin"] != $transactPin) {
                 return $this->sendError("Incorrect transaction pin supplied", [], 400);
@@ -225,6 +250,18 @@ class PurchaseService {
                 $purchaseData['customer_number'] = $optionalData["customer_number"];
             }
 
+            $unverifiedPurchaseBlc = (float) ($vendingRestriction["unverified_purchase"] - $totalPurchase);
+
+            if ($theUserVendingStatus != "offlimit" AND $vendingRestriction['status'] == 'enable' AND $unverifiedPurchaseBlc < $sellingPrice) {
+                $theUserAccessControl['suspension'] = ['status' => '1', 'date' => Carbon::now()];
+                User::where(['id' => $theUserId])->update(['access_control' => json_encode($theUserAccessControl)]);
+                return $this->sendError("You are unverified to perform such transaction. Kindly notify Admin", [], 400);
+            }
+
+            if ($theUserSuspensionStatus == "1") {
+                return $this->sendError("You are currently suspended from making purchase. Kindly notify Admin", [], 400);
+            }
+
             // Using this for database record
             $transactParams = [
                 "user_id" => $theUserId,
@@ -246,6 +283,12 @@ class PurchaseService {
             return $e->getMessage();
         }
     }
+    
+
+    private function getUserTotalPurchase($userId) {
+        $totalPurchase = Transaction::where(['user_id' => $userId, 'status' => '1'])->orWhere(['status' => 0])->sum('amount');
+        return $totalPurchase;
+    }
 
     /**
      * purchaseAirtime is used for sending airtime purchase to the vendor
@@ -255,6 +298,11 @@ class PurchaseService {
             $theUser = Auth::user();
             $theUserId = $theUser["id"];
             $theUserPlanId = $theUser["plan_id"];
+            $vendingRestriction = json_decode($this->utilityService->vendingRestriction(), true);
+            $totalPurchase = self::getUserTotalPurchase($theUserId);
+            $theUserAccessControl = json_decode($theUser["access_control"], true);
+            $theUserVendingStatus = $theUserAccessControl['vending']['status'];
+            $theUserSuspensionStatus = $theUserAccessControl['suspension']['status'];
 
             if($theUser["secret_pin"] != $transactPin) {
                 return $this->sendError("Incorrect transaction pin supplied", [], 400);
@@ -277,6 +325,18 @@ class PurchaseService {
             
             if($currentUserBalance < $sellingPrice) {
                 return $this->sendError("Insufficient wallet balance. Kindly topup your wallet to complete your request", [], 400);
+            }
+
+            $unverifiedPurchaseBlc = (float) ($vendingRestriction["unverified_purchase"] - $totalPurchase);
+
+            if ($theUserVendingStatus != "offlimit" AND $vendingRestriction['status'] == 'enable' AND $unverifiedPurchaseBlc < $sellingPrice) {
+                $theUserAccessControl['suspension'] = ['status' => '1', 'date' => Carbon::now()];
+                User::where(['id' => $theUserId])->update(['access_control' => json_encode($theUserAccessControl)]);
+                return $this->sendError("You are unverified to perform such transaction. Kindly notify Admin", [], 400);
+            }
+
+            if ($theUserSuspensionStatus == "1") {
+                return $this->sendError("You are currently suspended from making purchase. Kindly notify Admin", [], 400);
             }
 
             // Send this to provider...
@@ -320,6 +380,11 @@ class PurchaseService {
             $theUser = Auth::user();
             $theUserId = $theUser["id"];
             $theUserPlanId = $theUser["plan_id"];
+            $vendingRestriction = json_decode($this->utilityService->vendingRestriction(), true);
+            $totalPurchase = self::getUserTotalPurchase($theUserId);
+            $theUserAccessControl = json_decode($theUser["access_control"], true);
+            $theUserVendingStatus = $theUserAccessControl['vending']['status'];
+            $theUserSuspensionStatus = $theUserAccessControl['suspension']['status'];
 
             if($theUser["secret_pin"] != $transactPin) {
                 return $this->sendError("Incorrect transaction pin supplied", [], 400);
@@ -336,6 +401,18 @@ class PurchaseService {
             $sellingPrice = $productPricing["selling_price"];
             if($currentUserBalance < $sellingPrice) {
                 return $this->sendError("Insufficient wallet balance. Kindly topup your wallet to complete your request", [], 400);
+            }
+
+            $unverifiedPurchaseBlc = (float) ($vendingRestriction["unverified_purchase"] - $totalPurchase);
+
+            if ($theUserVendingStatus != "offlimit" AND $vendingRestriction['status'] == 'enable' AND $unverifiedPurchaseBlc < $sellingPrice) {
+                $theUserAccessControl['suspension'] = ['status' => '1', 'date' => Carbon::now()];
+                User::where(['id' => $theUserId])->update(['access_control' => json_encode($theUserAccessControl)]);
+                return $this->sendError("You are unverified to perform such transaction. Kindly notify Admin", [], 400);
+            }
+
+            if ($theUserSuspensionStatus == "1") {
+                return $this->sendError("You are currently suspended from making purchase. Kindly notify Admin", [], 400);
             }
 
             // Send this to provider...
@@ -376,6 +453,11 @@ class PurchaseService {
             $theUser = Auth::user();
             $theUserId = $theUser["id"];
             $theUserPlanId = $theUser["plan_id"];
+            $vendingRestriction = json_decode($this->utilityService->vendingRestriction(), true);
+            $totalPurchase = self::getUserTotalPurchase($theUserId);
+            $theUserAccessControl = json_decode($theUser["access_control"], true);
+            $theUserVendingStatus = $theUserAccessControl['vending']['status'];
+            $theUserSuspensionStatus = $theUserAccessControl['suspension']['status'];
 
             if($theUser["secret_pin"] != $transactPin) {
                 return $this->sendError("Incorrect transaction pin supplied", [], 400);
@@ -391,6 +473,18 @@ class PurchaseService {
             $sellingPrice = $productPricing["selling_price"];
             if($currentUserBalance < $sellingPrice) {
                 return $this->sendError("Insufficient wallet balance. Kindly topup your wallet to complete your request", [], 400);
+            }
+
+            $unverifiedPurchaseBlc = (float) ($vendingRestriction["unverified_purchase"] - $totalPurchase);
+
+            if ($theUserVendingStatus != "offlimit" AND $vendingRestriction['status'] == 'enable' AND $unverifiedPurchaseBlc < $sellingPrice) {
+                $theUserAccessControl['suspension'] = ['status' => '1', 'date' => Carbon::now()];
+                User::where(['id' => $theUserId])->update(['access_control' => json_encode($theUserAccessControl)]);
+                return $this->sendError("You are unverified to perform such transaction. Kindly notify Admin", [], 400);
+            }
+
+            if ($theUserSuspensionStatus == "1") {
+                return $this->sendError("You are currently suspended from making purchase. Kindly notify Admin", [], 400);
             }
 
             // Send this to provider...
@@ -512,6 +606,8 @@ class PurchaseService {
 
         // Send it to the provider...
         $sendToProvider = $this->sendToProvider($purchaseData, $theProductApi);
+
+        // return $sendToProvider;
 
         $transactionData["vendorRequest"] = $vendorRequest;
         $transactionData["purchase"] = $purchaseData;

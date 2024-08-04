@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Exception;
+use App\Vendors\Smeplug;
 use App\Models\WalletOut;
 use App\Vendors\MobileNig;
 use App\Models\Transaction;
@@ -15,6 +16,7 @@ class verifyAirtime extends Command
 {
 
     protected $productService, $dataRequest, $walletService;
+
     public function __construct(WalletService $walletService)
     {
         parent::__construct();
@@ -50,8 +52,8 @@ class verifyAirtime extends Command
         $getTransactions = Transaction::with('api.vendor')->where(['status' => '2', 'category' => 'airtime'])->limit(10)->get();
         if(count($getTransactions) > 0) {
             foreach($getTransactions as $orderInfo) {
-
-                if($orderInfo['api']['vendor']['vendor_code'] != 'local_server') {
+                $vendorCode = strtolower($orderInfo['api']['vendor']['vendor_code']);
+                if($vendorCode != 'local_server') {
                     
                     $reference = $orderInfo['reference'];
                     $theProductApi = $orderInfo['api'];
@@ -72,20 +74,20 @@ class verifyAirtime extends Command
     private function updateOrder($reference, $providerResponse) {
         $decodeResponse = json_decode($providerResponse->getContent(), true)["data"];
         
-        if($providerResponse->getStatusCode() === 200) {
-            // decode the provider response...
-            $txStatus = $decodeResponse['delivery_status'];
-            
-            Transaction::whereIn("status", ['0', '2'])->where(['reference' => $reference])->update(["status" => $txStatus, "response" => json_encode($decodeResponse)]);
-            WalletOut::where(['status' => '0', 'reference' => $reference])->update(["status" => $txStatus]);
-        } else {
-            try {
+        DB::transaction(function() use ($reference, $decodeResponse, $providerResponse) {
+            if($providerResponse->getStatusCode() === 200) {
+                // decode the provider response...
+                $txStatus = $decodeResponse['delivery_status'];
+                
+                Transaction::whereIn("status", ['0', '2'])->where(['reference' => $reference])->update(["status" => $txStatus, "response" => json_encode($decodeResponse)]);
+                WalletOut::where(['status' => '0', 'reference' => $reference])->update(["status" => $txStatus]);
+            } else {
                 // Let's find the transaction and perform a refund if it fails...
                 $findTxn = Transaction::whereIn("status", ['0', '2'])->where(['reference' => $reference])->first();
-                
+                                
                 if($findTxn) {
                     $extraInfo = json_decode($findTxn['extra_info'], true);
-                    $description = "Refund of ".strtoupper($extraInfo['product']). " for ".$extraInfo['destination'];
+                    $description = "Refund of ".strtoupper($extraInfo['network']). " for ".$extraInfo['destination'];
                     $amountCharged = $findTxn->amount;
                     $userId = $findTxn->user_id;
 
@@ -127,18 +129,11 @@ class verifyAirtime extends Command
                     $findTxn->save(); 
                     
                     WalletOut::where(['status' => '0', 'reference' => $reference])->update(["status" => "3"]);
-                    DB::commit();
-                    return;
+                } else {
+                    Log::channel('daily')->info($reference ." => Reference ($reference) not found");
                 }
-                DB::rollBack();
-                Log::channel('daily')->info($reference ." => Reference ($reference) not found");
-                return;
             }
-            catch(Exception $e) {
-                DB::rollBack();
-                Log::channel('daily')->info($reference ." => Failed to refund");
-            }
-        }
+        }, 5); // Retry up to 5 times in case of deadlock
     }
     
     // Let's send the request to the provider
@@ -150,6 +145,12 @@ class verifyAirtime extends Command
             case "mobilenig":
                 // Let's prepare some key info about the delivery of the order...
                 $connectVendor = app(MobileNig::class);
+                $submitOrder = $connectVendor->processRequest($verifyData, $apiDetails);
+            break;
+            
+            case "smeplug":
+                // Let's prepare some key info about the delivery of the order...
+                $connectVendor = app(Smeplug::class);
                 $submitOrder = $connectVendor->processRequest($verifyData, $apiDetails);
             break;
 

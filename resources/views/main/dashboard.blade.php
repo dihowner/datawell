@@ -15,16 +15,15 @@
                     @include('components.main.topnav')
                     @include('components.main.breadcrumb')
 
-                    {{-- @if (session()->has('info')) --}}
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="alert alert-info p-3">
-                                {{-- {{ $totalPendingPayment }} --}}
-                                {{-- {{ session('info') }} --}}
+                    @if (session()->has('info'))
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info p-3">
+                                    {{ session('info') }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    {{-- @endif --}}
+                    @endif
 
                     <div class="app-dashboard"></div>
 
@@ -294,7 +293,324 @@
                                     </div>
                                 </div>
                             </div>
-                </div>`;
+                        </div>
+                        <div class='row'>
+
+                            <div class="col-lg-12 m-3">
+                                <h4><strong style="font-size: 24px">MTN Statistics</strong></h4>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Today's Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.mtn_today_total} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Yesterday Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.mtn_yesterday_total} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>This Week Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.mtn_this_week} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>This Month Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.mtn_this_month} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Last Month Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.mtn_last_month} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            <div class="col-lg-12 m-3">
+                                <h4><strong style="font-size: 24px">Airtel Statistics</strong></h4>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Today's Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.airtel_today_total} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Yesterday Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.airtel_yesterday_total} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>This Week Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.airtel_this_week} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>This Month Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.airtel_this_month} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Last Month Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.airtel_last_month} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            <div class="col-lg-12 m-3">
+                                <h4><strong style="font-size: 24px">Glo Statistics</strong></h4>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Today's Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.glo_today_total} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Yesterday Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.glo_yesterday_total} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>This Week Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.glo_this_week} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>This Month Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.glo_this_month} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Last Month Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.glo_last_month} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            <div class="col-lg-12 m-3">
+                                <h4><strong style="font-size: 24px">9mobile Statistics</strong></h4>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Today's Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.eti_today_total} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Yesterday Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.eti_yesterday_total} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>This Week Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.eti_this_week} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>This Month Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.eti_this_month} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="mb-2 fs-18 text-muted">
+                                                    <strong>Last Month Volume</strong>
+                                                </div>
+                                                <h1 class="font-weight-bold mb-1">${response.data.eti_last_month} GB</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
 
             outputField.html(resultHtml);
         }

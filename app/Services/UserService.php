@@ -348,18 +348,50 @@ class UserService extends SettingsService {
         return $users;
     }
 
-    public function updateUser($updateData) {
+    public function updateUser(array $updateData) {
 
-        $query = User::where('id', $updateData['id']);
-
-        if (isset($updateData['plan_id'])) {
-            $query->update(['plan_id' => $updateData['plan_id']]);
-        }
-
-        if (isset($updateData['transactpin'])) {
-            $query->update(['secret_pin' => $updateData['transactpin']]);
-        }
+        $user = User::where('id', $updateData['id'])->first();
+        $accessControl = json_decode($user->access_control, true);
+        $accessControl['vending']['status'] = $updateData['vending_restriction'];
+        
+        $user->plan_id = $updateData['plan_id'];
+        $user->secret_pin = $updateData['transactpin'];
+        $user->access_control = json_encode($accessControl);       
+        $user->save(); 
         return $this->sendResponse("User updated successfully", [], 200);
+    }
+    
+    public function updateUserAccessControl($id, $action) {
+        $user = User::find($id);
+        if (!$user) {
+            return $this->sendError("User does not exists", [], 404);
+        }
+        $isUpdated = false;        
+        switch ($action) {
+            case "suspend":
+                $accessControl = json_decode($user->access_control, true);
+                $accessControl['suspension']['status'] = 1;
+
+                $user->access_control = json_encode($accessControl);       
+                $user->save(); 
+                $isUpdated = true;
+            break;
+            case "unsuspend":
+                $accessControl = json_decode($user->access_control, true);
+                $accessControl['suspension']['status'] = 0;
+
+                $user->access_control = json_encode($accessControl);       
+                $user->save(); 
+                $isUpdated = true;
+            break;
+            default:
+                return $this->sendError("Invalid action", [], 400);
+        }
+        
+        if ($isUpdated) {
+            return $this->sendResponse("User updated successfully", [], 200);
+        }
+        return $this->sendError("Error updating request", [], 400);
     }
 
 }

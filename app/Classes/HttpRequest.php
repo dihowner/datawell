@@ -21,7 +21,7 @@ class HttpRequest  {
     public static function sendPost(string $endpoint, $body, array $header = []) {
         try {
             
-            $sendPost = Http::withHeaders($header)->timeout(-1)->post($endpoint, $body);
+            $sendPost = Http::withHeaders($header)->post($endpoint, $body);
             return $sendPost->json();
         } catch (RequestException $e) {
             if ($e->getCode() == CURLE_OPERATION_TIMEOUTED) {

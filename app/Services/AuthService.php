@@ -13,6 +13,7 @@ use App\Models\VerifyRegistration;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class AuthService  {
     use ResponseTrait;
@@ -99,8 +100,13 @@ class AuthService  {
                 $this->responseBody = $this->sendError("Default system plan not found", [], 400);
             }
             else {
+                $accessControl = [
+                    "suspension" => ["status" => 0],
+                    "vending" => ["status" => "restricted"],
+                ];
                 $registerData['password'] = Hash::make($registerData['password']);
                 $registerData['plan_id'] = $default_plan_id;
+                $registerData['access_control'] = json_encode($accessControl);
                 $theUser = User::create($registerData);
                 if($theUser) {
                     $verifyCode = Str::random(24);
@@ -115,6 +121,7 @@ class AuthService  {
             }
         }
         catch(Exception $e) {
+            Log::channel('daily')->info($e->getMessage());
             $this->responseBody = $this->sendError("Error creating user account", [], 400);
         }
         return $this->responseBody;

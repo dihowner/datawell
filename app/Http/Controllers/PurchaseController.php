@@ -16,6 +16,7 @@ use App\Http\Requests\DataPurchaseRequest;
 use App\Http\Requests\ServiceVerifyRequest;
 use App\Http\Controllers\CategoryController;
 use App\Services\UtilityService;
+use Illuminate\Support\Facades\Session;
 
 class PurchaseController extends Controller
 {
@@ -108,12 +109,15 @@ class PurchaseController extends Controller
 
         $processAirtime = $this->purchaseService->purchaseAirtime($network, $phoneNumber, $amount, $transactPin);
 
+        // return $processAirtime;
+
         $responseCode = $processAirtime->getStatusCode();
         $responseContent = json_decode($processAirtime->content(), true);
 
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message. " Kindly check your balance";
+            Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {
@@ -196,6 +200,7 @@ class PurchaseController extends Controller
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message. " Kindly check your balance";
+            Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {
@@ -277,6 +282,7 @@ class PurchaseController extends Controller
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message;
+            Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {
@@ -331,6 +337,7 @@ class PurchaseController extends Controller
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message;
+            Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {
@@ -513,6 +520,7 @@ class PurchaseController extends Controller
         if($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message;
+            Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {

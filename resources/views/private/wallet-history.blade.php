@@ -77,7 +77,7 @@
                                                     @endphp
                                                     @foreach ($userIncome->sortByDesc('created_at') as $record)
                                                         <tr>
-                                                            <th scope="row">{{ $i }}</th>
+                                                            <td scope="row">{{ $i }}</td>
                                                             <td>
                                                                 <strong
                                                                     class="d-block">{{ $record['description'] }}</strong>

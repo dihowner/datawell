@@ -81,7 +81,7 @@
                                                             $referenceId = $record['reference'];
                                                         @endphp
                                                         <tr>
-                                                            <th scope="row">{{ $i }}</th>
+                                                            <td scope="row">{{ $i }}</td>
                                                             <td>
                                                                 <strong
                                                                     class="d-block">{{ $record['description'] }}</strong>

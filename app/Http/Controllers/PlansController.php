@@ -34,7 +34,6 @@ class PlansController extends Controller
     public function allPlans() {
         try {
             $allPlans = $this->planService->getAllPlan();
-            // return $allPlans;
             return view('main.plan-mgt', compact('allPlans'));
         }
         catch(Exception $e) {

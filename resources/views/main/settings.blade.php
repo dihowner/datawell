@@ -9,6 +9,7 @@
     $paystackInfo = json_decode($UtilityService->paystackInfo(), true);
     $airtimeInfo = json_decode($UtilityService->airtimeInfo(), true);
     $airtimeConversion = json_decode($UtilityService->airtimeConversion(), true);
+    $vendingRestriction = json_decode($UtilityService->vendingRestriction(), true);
     
     $mtnConversion = $airtimeConversion['mtn'];
     $airtelConversion = $airtimeConversion['airtel'];
@@ -46,6 +47,47 @@
                     @endif
 
                     <div class="row">
+
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Vending Restriction</h3>
+                                </div>
+                                <form method="post" action="{{ route('update-restrict-vending') }}">
+                                    @method('PUT')
+                                    @csrf
+                                    <div class="card-body">
+                                        <div class="row"> 
+
+                                            <div class="col-md-12 mb-2">
+                                                <label>Enter Amount </label>
+                                                <input class="form-control form-control-lg" value="{{ $vendingRestriction['unverified_purchase'] }}"
+                                                    placeholder="Amount user can purchase if admin restrict them" name="unverified_purchase"/>
+                                            </div>
+
+                                            <div class="col-md-12 mb-2">
+                                                <label>Status</label>
+                                                <select class="form-control form-control-lg" name="status">
+                                                    <option value="enable" {{ $vendingRestriction['status'] == 'enable' ? "selected='selected'" : ""}}>
+                                                        Enable Purchase Restriction
+                                                    </option>
+                                                    <option value="disable" {{ $vendingRestriction['status'] == 'disable' ? "selected='selected'" : ""}}>
+                                                        Disable Purchase Restriction
+                                                    </option>
+                                                </select>
+                                                <input class="form-control form-control-lg" type="hidden"
+                                                    name="updateVendRestriction" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="text-center">
+                                            <button class="btn btn-danger btn-lg btn-block">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
 
                         <div class="col-lg-6">
                             <div class="card">
@@ -531,3 +573,4 @@
     </div>
 
     @include('components.footer-script')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.0/dist/sweetalert2.all.min.js"></script>

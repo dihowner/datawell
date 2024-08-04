@@ -130,7 +130,12 @@ class WalletController extends Controller
             $validatedData = $request->validate([
                 'query' => 'required|string|max:50'
             ]);
-            $userId = $this->userService->getUserByPhone_Username($validatedData['query'])['id'];
+            $getUser = $this->userService->getUserByPhone_Username($validatedData['query']);
+            if(!$getUser) {
+                Alert::error("Error", "User not found");
+                return redirect()->back();
+            }
+            $userId = $getUser['id'];
         }
 
         $histories = $this->walletService->userInwardHistory($userId);

@@ -10,6 +10,7 @@ use App\Services\ProductService;
 use App\Services\SettingsService;
 use App\Http\Requests\SettingsRequest;
 use App\Services\TransactionService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -43,6 +44,7 @@ class AdminController extends Controller
 
         // dd(Session::all());
         // return auth()->guard('admin')->user();
+        // return $this->fetchDashboardStats();
         return view('main.dashboard');
     }
 
@@ -54,6 +56,30 @@ class AdminController extends Controller
         $lastWeekTransaction = $this->transactService->transactionSummary('last_week');
         $thisMonthTransaction = $this->transactService->transactionSummary('this_month');
         $lastMonthTransaction = $this->transactService->transactionSummary('last_month');
+        
+        $mtnYesterdayTransaction = $this->transactService->dataSummary('mtn', 'yesterday_total');
+        $mtnTodayTransaction = $this->transactService->dataSummary('mtn', 'today_total');
+        $mtnThisWeekTransaction = $this->transactService->dataSummary('mtn', 'this_week');
+        $mtnThisMonthTransaction = $this->transactService->dataSummary('mtn', 'this_month');
+        $mtnLastMonthTransaction = $this->transactService->dataSummary('mtn', 'last_month');
+        
+        $airtelYesterdayTransaction = $this->transactService->dataSummary('airtel', 'yesterday_total');
+        $airtelTodayTransaction = $this->transactService->dataSummary('airtel', 'today_total');
+        $airtelThisWeekTransaction = $this->transactService->dataSummary('airtel', 'this_week');
+        $airtelThisMonthTransaction = $this->transactService->dataSummary('airtel', 'this_month');
+        $airtelLastMonthTransaction = $this->transactService->dataSummary('airtel', 'last_month');
+        
+        $gloYesterdayTransaction = $this->transactService->dataSummary('glo', 'yesterday_total');
+        $gloTodayTransaction = $this->transactService->dataSummary('glo', 'today_total');
+        $gloThisWeekTransaction = $this->transactService->dataSummary('glo', 'this_week');
+        $gloThisMonthTransaction = $this->transactService->dataSummary('glo', 'this_month');
+        $gloLastMonthTransaction = $this->transactService->dataSummary('glo', 'last_month');
+        
+        $etiYesterdayTransaction = $this->transactService->dataSummary('9mobile', 'yesterday_total');
+        $etiTodayTransaction = $this->transactService->dataSummary('9mobile', 'today_total');
+        $etiThisWeekTransaction = $this->transactService->dataSummary('9mobile', 'this_week');
+        $etiThisMonthTransaction = $this->transactService->dataSummary('9mobile', 'this_month');
+        $etiLastMonthTransaction = $this->transactService->dataSummary('9mobile', 'last_month');
         
         return [
             "users" => $this->userService->totalUser(),
@@ -73,6 +99,31 @@ class AdminController extends Controller
                 "last_week_profit" => $lastWeekTransaction->profit,  
                 "this_month_profit" => $thisMonthTransaction->profit,  
                 "last_month_profit" => $lastMonthTransaction->profit,
+            ],
+            "data" => [
+                "mtn_yesterday_total" => $mtnYesterdayTransaction,
+                "mtn_today_total" => $mtnTodayTransaction,
+                "mtn_this_week" => $mtnThisWeekTransaction,
+                "mtn_this_month" => $mtnThisMonthTransaction,
+                "mtn_last_month" => $mtnLastMonthTransaction,
+                
+                "airtel_yesterday_total" => $airtelYesterdayTransaction,
+                "airtel_today_total" => $airtelTodayTransaction,
+                "airtel_this_week" => $airtelThisWeekTransaction,
+                "airtel_this_month" => $airtelThisMonthTransaction,
+                "airtel_last_month" => $airtelLastMonthTransaction,
+                
+                "glo_yesterday_total" => $gloYesterdayTransaction,
+                "glo_today_total" => $gloTodayTransaction,
+                "glo_this_week" => $gloThisWeekTransaction,
+                "glo_this_month" => $gloThisMonthTransaction,
+                "glo_last_month" => $gloLastMonthTransaction,
+                
+                "eti_yesterday_total" => $etiYesterdayTransaction,
+                "eti_today_total" => $etiTodayTransaction,
+                "eti_this_week" => $etiThisWeekTransaction,
+                "eti_this_month" => $etiThisMonthTransaction,
+                "eti_last_month" => $etiLastMonthTransaction
             ]
         ];
     }
@@ -150,6 +201,30 @@ class AdminController extends Controller
             Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
             Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
+        }
+        return redirect()->back();
+    }
+    
+    public function updateKycCharge(SettingsRequest $request) {
+        
+        $updateAirtimeConversion = $this->settingsService->updateSettings($request->validated(), "kycCharges");
+                
+        $decodeResponse = json_decode($updateAirtimeConversion->getContent(), true);
+        if($updateAirtimeConversion->getStatusCode() == 200) {
+            Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
+        } else {
+            Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
+        }
+        return redirect()->back();
+    }
+    
+    public function updateVendRestriction(SettingsRequest $request) {
+        $updateVendingRestriction = $this->settingsService->updateSettings($request->validated(), "vendingRestriction");
+        $decodeResponse = json_decode($updateVendingRestriction->getContent(), true);
+        if($updateVendingRestriction->getStatusCode() == 200) {
+            Alert::success("Success", $decodeResponse['message']);
+        } else {
+            Alert::error("Error", $decodeResponse['message']);
         }
         return redirect()->back();
     }

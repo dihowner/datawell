@@ -62,6 +62,67 @@ class TransactionService {
                     ->first();
                     
     }
+    
+    public function dataSummary($networkName, $transactType) {
+        switch($transactType) {
+            case "yesterday_profit":
+            case "yesterday_total":
+                $startDate = Carbon::yesterday()->startOfDay()->format('Y-m-d H:i');
+                $endDate = Carbon::yesterday()->endOfDay()->format('Y-m-d H:i');
+            break;
+            
+            case "today_profit":
+            case "today_total":
+                $startDate = Carbon::today()->startOfDay()->format('Y-m-d H:i'); // 00:00:00
+                $endDate = Carbon::today()->endOfDay()->format('Y-m-d H:i'); // 23:59:59
+            break;
+
+            case "last_week":
+                $startDate = Carbon::now()->subWeek()->startOfWeek()->format('Y-m-d H:i');
+                $endDate = Carbon::now()->subWeek()->endOfWeek()->format('Y-m-d H:i');
+            break;
+
+            case "this_week":
+                $startDate = Carbon::now()->startOfWeek()->format('Y-m-d H:i');
+                $endDate = Carbon::now()->endOfWeek()->format('Y-m-d H:i');
+            break;
+            
+            case "this_month":
+                $startDate = Carbon::now()->startOfMonth()->format('Y-m-d H:i');
+                $endDate = Carbon::now()->endOfMonth()->endOfDay()->format('Y-m-d H:i');
+            break;
+            
+            case "last_month":
+                $startDate = Carbon::now()->subMonth()->startOfMonth()->format('Y-m-d H:i');
+                $endDate = Carbon::now()->subMonth()->endOfMonth()->format('Y-m-d H:i');
+            break;
+
+        }
+        
+        $dataTxns = Transaction::where(['category' => 'data', 'status' => '1'])->where('description', 'like',  '%' . $networkName . '%')
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->select('description')->get();
+        $totalVolume = 0;
+
+        if ($dataTxns->count() > 0) {
+            $unwantedArray = ['purchase of ', 'mtn ', 'sme ', 'cg ', 'gifting ', 'airtel ', 'glo ', '9mobile ', '/30days', '30days', '30 days', '(special)' ];
+            foreach ($dataTxns as $dataIndex => $dataTxn) {
+                $description = trim(substr(str_replace($unwantedArray, '', strtolower($dataTxn->description)), 0,-16));
+
+                if (str_contains($description, 'gb')) {
+                    $volume = str_replace('gb', '', $description);
+                } else if (str_contains($description, 'mb')) {
+                    $volume = str_replace('mb', '', $description);
+                    $volume = $volume/1000;
+                } 
+
+                if (is_numeric($volume)){
+                    $totalVolume += $volume;
+                }
+            }
+        }
+        return number_format($totalVolume, 2);                    
+    }
 
     public function userTransactionSummary($userId) {
         $statusOut = ['0', '1', '2'];
@@ -102,6 +163,13 @@ class TransactionService {
                     WalletOut::whereIn('reference', $txIDs)->update(['status' => '0']);
                     DB::commit();
                     return $this->sendResponse(count($txIDs). " Transactions retried successfully", [], 200);
+                break;
+                
+                case "awaiting":
+                    Transaction::whereIn('reference', $txIDs)->update(['status' => '2', 'memo' => $txnMemo]);
+                    WalletOut::whereIn('reference', $txIDs)->update(['status' => '2']);
+                    DB::commit();
+                    return $this->sendResponse(count($txIDs). " Transactions status update to awaiting successfully", [], 200);
                 break;
                 
                 case "complete":
@@ -175,7 +243,7 @@ class TransactionService {
     }
 
     public function userPurchaseHistory($userId = "", $searchValue = "", $status = "all") {
-        $query = Transaction::whereNotNull('user_id')->limit(100)->orderByDesc('created_at');
+        $query = Transaction::whereNotNull('user_id')->orderByDesc('created_at');
 
         if (!empty($userId)) {
             $query->where('user_id', $userId);
@@ -204,14 +272,30 @@ class TransactionService {
         return $paginatedRecords;
     }
 
-    public function viewTransaction($userId = "", $reference) {
-        $query = Transaction::where('reference', $reference)->whereNotNull('user_id');
+    public function getTransaction($userId = "", $reference) {
+        $query = Transaction::with('user')->where('reference', $reference)->whereNotNull('user_id');
         
         if (!empty($userId)) {
             $query->where('user_id', $userId);
         }
         
         $txnRecord = $query->first();
+
+        if($txnRecord == NULL) { return false; }
+        
+        return $txnRecord;
+    }
+
+    public function getMultipleTransactions($reference, $status = "all") {
+        $query = Transaction::with('user')->where('reference', $reference)->orWhere('destination', $reference);
+        
+        if ($status != "all") {
+            $query->where("status", $status);
+        } else {
+            $query->whereIn("status", ['0', '1', '2']);
+        }
+
+        $txnRecord = $query->orderBy('id', 'desc')->get();
 
         if($txnRecord == NULL) { return false; }
         

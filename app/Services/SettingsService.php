@@ -145,6 +145,42 @@ class SettingsService  {
                     }
                     return $this->sendError("Error updating airtime Conversion settings", [], 400);
                 break;
+                
+                case "kycCharges":
+                
+                    $airtimeData = [
+                        "nin" => $settingsData["nin"],
+                        "bvn" => $settingsData["bvn"]
+                    ];
+                    $updatekycCharges = Settings::where('name', 'kycCharges')->update(["content" => json_encode($airtimeData)]);
+    
+                    if($updatekycCharges) {
+                        return $this->sendResponse("KYC Charges updated successfully", [], 200);
+                    }
+                    return $this->sendError("Error updating kyc charges settings", [], 400);
+                break;
+                
+                case "vendingRestriction":
+
+                    $status = $settingsData["status"];
+                    $unverified_purchase = $settingsData["unverified_purchase"];
+                
+                    if ($unverified_purchase <= 0 AND $status == 'enable') {
+                        return $this->sendError("Purchase amount must be greater than 0 if status is enabled", [], 400);
+                    }
+
+                    $restrictData = [
+                        "unverified_purchase" => $settingsData["unverified_purchase"],
+                        "status" => $settingsData["status"],
+                    ];
+                    
+                    $updateVendingRestriction = Settings::where('name', 'vending_restriction')->update(["content" => json_encode($restrictData)]);
+    
+                    if($updateVendingRestriction) {
+                        return $this->sendResponse("Vending restriction settings updated successfully", [], 200);
+                    }
+                    return $this->sendError("Error updating vending restriction settings", [], 400);
+                break;
             }
         }
         catch(Exception $e) {

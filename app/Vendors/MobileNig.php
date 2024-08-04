@@ -412,6 +412,8 @@ class MobileNig {
             $decode_response = $apiResponse;
             // $decode_response = json_decode($apiResponse, true);
 
+            Log::channel('daily')->info($decode_response);
+
             if($decode_response['statusCode'] == "200") {
                 $reformResponse = $decode_response;
                 $reformResponse['delivery_status'] = "1";

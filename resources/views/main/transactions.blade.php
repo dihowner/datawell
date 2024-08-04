@@ -64,7 +64,7 @@
                                                             $userInfo = $record->user;
                                                         @endphp
                                                         <tr>
-                                                            <th scope="row">{{ $i }}</th>
+                                                            <td scope="row">{{ $i }}</td>
                                                             
                                                                 <td class="align-middle">
                                                                     <div class="d-flex">

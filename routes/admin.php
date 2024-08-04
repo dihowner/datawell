@@ -55,7 +55,9 @@ Route::prefix('main')->group(function() {
             Route::put('/update-flutterwave', "updateFlutterwave")->name('update-flutterwave');
             Route::put('/update-paystack', "updatePaystack")->name('update-paystack');
             Route::put('/update-airtime-info', "updateAirtimeInfo")->name('update-airtime-info');
+            Route::put('/update-restrict-vending', "updateVendRestriction")->name('update-restrict-vending');
             Route::put('/update-airtime-conversion', "updateAirtimeConversion")->name('update-airtime-conversion');
+            Route::put('/update-kyc-charge', "updateKycCharge")->name('update-kyc-charge');
         });
 
         Route::controller(UserController::class)->group(function() {
@@ -65,6 +67,8 @@ Route::prefix('main')->group(function() {
             Route::prefix('user')->group(function() {
                 Route::get("/{id}/generate-va", "GenerateUserVirtualAccount");
                 Route::put("/{id}/update-user", "updateUser")->name('update-user');
+                Route::get("/exportCsv", "exportUserCSV")->name('user-export-csv');
+                Route::get("/{id}/{action}", "updateUserAccessControl")->name('update-user-access-control');
             });
             
         });
@@ -87,6 +91,8 @@ Route::prefix('main')->group(function() {
             Route::get('/successful', 'getSuccessfulPurchaseHistory')->name('admin-successful-transactions-histories');
             Route::get('/awaiting', 'getAwaitingPurchaseHistory')->name('admin-awaiting-transactions-histories');
             Route::get('/pending', 'getPendingPurchaseHistory')->name('admin-pending-transactions-histories');
+            Route::get('/modifystatus', 'modifyStatusView')->name('admin-modify-status');
+            Route::get('/search', 'searchOrderModify')->name('admin-search-order-modify');
 
             Route::post('/process-transaction', 'ProcessTransaction')->name('process-transaction');
         });
