@@ -57,6 +57,8 @@ class DataRequestService {
             $mobilenig = isset($requestData['mobilenig']) ? $requestData['mobilenig'] : NULL;
             $init_code = isset($requestData['init_code']) ? $requestData['init_code'] : NULL;
             $wrap_code = isset($requestData['wrap_code']) ? $requestData['wrap_code'] : NULL;
+            $smeplug = isset($requestData['smeplug']) ? $requestData['smeplug'] : NULL;
+            $ipay = isset($requestData['ipay']) ? $requestData['ipay'] : NULL;
             
             $checkRequest = DataRequest::where("product_id", $product_id)->first();
 
@@ -65,7 +67,8 @@ class DataRequestService {
             }
             DataRequest::create([
                 "product_id" => $product_id, "init_code" => $init_code, 
-                "wrap_code" => $wrap_code, "mobilenig" => $mobilenig
+                "wrap_code" => $wrap_code, "mobilenig" => $mobilenig, 
+                "smeplug" => $smeplug, "ipay" => $ipay
             ]);
             return $this->sendResponse("Data Bundle request added successfully", [], 200);
         }
@@ -82,6 +85,7 @@ class DataRequestService {
             $smeplug = isset($requestData['smeplug']) ? $requestData['smeplug'] : NULL;
             $init_code = isset($requestData['init_code']) ? $requestData['init_code'] : NULL;
             $wrap_code = isset($requestData['wrap_code']) ? $requestData['wrap_code'] : NULL;
+            $ipay = isset($requestData['ipay']) ? $requestData['ipay'] : NULL;
             
             $checkRequest = DataRequest::where("id", $requestId)->first();
 
@@ -93,7 +97,8 @@ class DataRequestService {
                 "init_code" => $init_code, 
                 "wrap_code" => $wrap_code,
                 "mobilenig" => $mobilenig,
-                "smeplug" => $smeplug
+                "smeplug" => $smeplug,
+                "ipay" => $ipay
             ]);
             return $this->sendResponse("Data Bundle request updated successfully", [], 200);
         }

@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('init_code', 50)->nullable();
             $table->string('wrap_code', 50)->nullable();
             $table->string('mobilenig', 50)->nullable();
+            $table->string('smeplug', 50)->nullable();
+            $table->string('ipay', 50)->nullable();
         });
     }
 

@@ -31,6 +31,7 @@ class AirtimeRequest extends FormRequest
                 "wrap_code" => "string|nullable",
                 "mobilenig" => "nullable",
                 "smeplug" => "nullable",   
+                "ipay" => "nullable",   
                 "id" => "excludeif:create-airtime-request,create-airtime-request",          
             ];
         }

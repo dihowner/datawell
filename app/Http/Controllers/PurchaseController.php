@@ -121,7 +121,7 @@ class PurchaseController extends Controller
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {
-            $message = $responseContent["message"];
+            $message = $responseContent["message"]. ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
@@ -204,7 +204,7 @@ class PurchaseController extends Controller
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {
-            $message = $responseContent["message"];
+            $message = $responseContent["message"] . ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
@@ -286,7 +286,7 @@ class PurchaseController extends Controller
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {
-            $message = $responseContent["message"];
+            $message = $responseContent["message"]. ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
@@ -341,7 +341,7 @@ class PurchaseController extends Controller
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {
-            $message = $responseContent["message"];
+            $message = $responseContent["message"]. ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
@@ -524,7 +524,7 @@ class PurchaseController extends Controller
             Alert::success("Success", $message)->autoClose(10000);
         }
         else {
-            $message = $responseContent["message"];
+            $message = $responseContent["message"]. ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();

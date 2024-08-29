@@ -53,6 +53,8 @@ class AirtimeRequestService {
             $init_code = $requestData['init_code'];
             $wrap_code = $requestData['wrap_code'];
             $mobilenig = isset($requestData['mobilenig']) ? $requestData['mobilenig'] : NULL;
+            $smeplug = isset($requestData['smeplug']) ? $requestData['smeplug'] : NULL;
+            $ipay = isset($requestData['ipay']) ? $requestData['ipay'] : NULL;
             
             $checkRequest = AirtimeRequest::where("product_id", $product_id)->first();
 
@@ -61,7 +63,9 @@ class AirtimeRequestService {
             }
             AirtimeRequest::create([
                 "product_id" => $product_id, "init_code" => $init_code,
-                "wrap_code" => $wrap_code, "mobilenig" => $mobilenig
+                "wrap_code" => $wrap_code, "mobilenig" => $mobilenig,
+                "smeplug" => $smeplug, "mobilenig" => $mobilenig,
+                "ipay" => $ipay
             ]);
             return $this->sendResponse("Airtime request added successfully", [], 200);
         }
@@ -78,6 +82,7 @@ class AirtimeRequestService {
             $wrap_code = $requestData['wrap_code'];
             $mobilenig = isset($requestData['mobilenig']) ? $requestData['mobilenig'] : NULL;
             $smeplug = isset($requestData['smeplug']) ? $requestData['smeplug'] : NULL;
+            $ipay = isset($requestData['ipay']) ? $requestData['ipay'] : NULL;
             
             $checkRequest = AirtimeRequest::where("id", $requestId)->first();
 
@@ -87,7 +92,8 @@ class AirtimeRequestService {
             
             AirtimeRequest::where('id', $requestId)->update([
                 "init_code" => $init_code, "wrap_code" => $wrap_code, 
-                "mobilenig" => $mobilenig, "smeplug" => $smeplug
+                "mobilenig" => $mobilenig, "smeplug" => $smeplug, 
+                "ipay" => $ipay
             ]);
             return $this->sendResponse("Airtime request updated successfully", [], 200);
         }

@@ -27,6 +27,7 @@ class DataPurchaseRequest extends FormRequest
         if(in_array(Route::currentRouteName(), ["create-data-request", "update-data-request"])) {
             return [
                 "product_id" => $this->has('product_id') !== false ? "string|required" : "",
+                "ipay" => "nullable",   
                 "mobilenig" => "nullable",   
                 "smeplug" => "nullable",   
                 "init_code" => "string|nullable",

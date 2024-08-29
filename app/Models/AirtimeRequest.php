@@ -9,7 +9,7 @@ class AirtimeRequest extends Model
 {
     use HasFactory;
     protected $fillable = [
-        "product_id", "init_code", "wrap_code", "mobilenig"
+        "product_id", "init_code", "wrap_code", "mobilenig", "smeplug", "ipay"
     ];
     
     public $timestamps = false;

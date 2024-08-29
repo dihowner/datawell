@@ -9,7 +9,7 @@ class DataRequest extends Model
 {
     use HasFactory;
     protected $fillable = [
-        "product_id", "init_code", "wrap_code", "peaktopup", "mobilenig", "smeplug"
+        "product_id", "init_code", "wrap_code", "ipay", "mobilenig", "smeplug"
     ];
     
     public $timestamps = false;

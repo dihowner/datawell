@@ -58,6 +58,7 @@
                                                     <th>Wrap Code</th>
                                                     <th>MobileNig</th>
                                                     <th>Smeplug</th>
+                                                    <th>Ipay</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -75,6 +76,7 @@
                                                             $wrapCode = $airtimeRequest->wrap_code;
                                                             $mobileNigCode = $airtimeRequest->mobilenig;
                                                             $smePlugCode = $airtimeRequest->smeplug;
+                                                            $ipayCode = $airtimeRequest->ipay;
                                                         @endphp
                                                         <tr>
                                                             <td>{{ $i }}</td>
@@ -94,6 +96,7 @@
                                                             <td>{{ $wrapCode }} </td>
                                                             <td>{{ $mobileNigCode }} </td>
                                                             <td>{{ $smePlugCode }} </td>
+                                                            <td>{{ $ipayCode }} </td>
                                                             <td>
 
                                                                 <a href="javacript:void(0)" data-toggle="modal"
@@ -172,6 +175,16 @@
                                                                                         name="smeplug"
                                                                                         value="{{ $smePlugCode }}"
                                                                                         placeholder="Enter smeplug code">
+                                                                                </div>
+
+                                                                                <div class="col-md-6 mb-2">
+                                                                                    <label class="form-label">Ipay
+                                                                                        Code</label>
+                                                                                    <input
+                                                                                        class="form-control form-control-lg"
+                                                                                        name="ipay"
+                                                                                        value="{{ $ipayCode }}"
+                                                                                        placeholder="Enter ipay code">
                                                                                 </div>
 
                                                                             </div>

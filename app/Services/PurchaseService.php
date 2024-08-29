@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use App\Services\TransactionService;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ProductPricingService;
+use App\Vendors\Ipay;
 
 class PurchaseService {
     use ResponseTrait;
@@ -636,6 +637,12 @@ class PurchaseService {
             case "smeplug":
                 // Let's prepare some key info about the delivery of the order...
                 $connectVendor = app(Smeplug::class);
+                $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
+            break;
+
+            case "ipay":
+                // Let's prepare some key info about the delivery of the order...
+                $connectVendor = app(Ipay::class);
                 $submitOrder = $connectVendor->processRequest($purchaseData, $apiDetails);
             break;
         }
