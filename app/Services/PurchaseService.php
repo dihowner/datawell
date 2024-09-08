@@ -4,6 +4,7 @@ namespace App\Services;
 use Exception;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Vendors\Ipay;
 use App\Vendors\Smeplug;
 use App\Vendors\MobileNig;
 use App\Models\Transaction;
@@ -12,16 +13,15 @@ use App\Services\WalletService;
 use App\Services\UtilityService;
 use App\Http\Traits\ResponseTrait;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Services\TransactionService;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ProductPricingService;
-use App\Vendors\Ipay;
 
 class PurchaseService {
     use ResponseTrait;
 
-    private $exemptVendor = false;
-    private $uniqueReference, $dateCreated;
+    private $exemptVendor, $uniqueReference, $dateCreated;
     protected $utilityService, $productService, $productPriceService, $walletService, $airtimeRequest, $dataRequest,
               $cabletvRequest, $eduRequest, $electrictyiRequest, $transactService, $responseBody;
 
@@ -39,6 +39,7 @@ class PurchaseService {
         $this->eduRequest = $eduRequest;
         $this->electrictyiRequest = $electrictyiRequest;
         $this->transactService = $transactService;
+        $this->exemptVendor = false;
 
         $this->uniqueReference = $this->utilityService->uniqueReference();
         $this->dateCreated = $this->utilityService->dateCreated();
@@ -522,74 +523,48 @@ class PurchaseService {
      *
      * Also, it's responsible for sending request to the provider.
      */
-    private function updateRequestByProductId($productId, $purchaseData, $transactionData = []) {
 
+     private function updateRequestByProductId($productId, $purchaseData, $transactionData = []) {
+        // Retrieve product and associated API/vendor data
         $theProduct = $this->productService->getProductById($productId);
-        $theProductApi = $theProduct["api"];
-        $vendorCode = $theProductApi["vendor"]["vendor_code"];
-        $purchaseCategory = $purchaseData["category"];
-
-        // Some services or product can't use localserver as vendor bcos we have no right over them or delivery means
-        if(self::isExemptCategory($theProduct['category']['category_name']) AND $vendorCode == "local_server") {
-            return $this->sendError("Something went wrong. Unable to fulfil request", [], 422);
-        }
-
-        if($theProduct === false) {
+        
+        if (!$theProduct) {
             return $this->sendError("Product not found", [], 404);
         }
-
-        if($theProduct["availability"] == "0") {
+    
+        $theProductApi = $theProduct["api"];
+        $vendorCode = $theProductApi["vendor"]["vendor_code"];
+        $purchaseCategory = strtolower($purchaseData["category"]);
+    
+        // Check for exempt category and local server vendor code
+        if (self::isExemptCategory($theProduct['category']['category_name']) && $vendorCode === "local_server") {
+            return $this->sendError("Unable to fulfil request", [], 422);
+        }
+    
+        if ($theProduct["availability"] == "0") {
             return $this->sendError("Product is currently unavailable", [], 400);
         }
-
-        if($vendorCode == "not_available") {
-            return $this->sendError("Error", "We are currently experiencing delivery degradation. Kindly try again in few minutes time", 400);
+    
+        if ($vendorCode === "not_available") {
+            return $this->sendError("Delivery degradation. Try again later", [], 400);
         }
-
-        if($purchaseCategory == "airtime") {
-            // Get the airtimeRequest code of the vendor...
-            $vendorRequest = $this->airtimeRequest->getAirtimeRequest($productId);
-        } else if($purchaseCategory == "data") {
-            // Get the dataRequest code of the vendor...
-            $vendorRequest = $this->dataRequest->getDataRequest($productId);
-        } else if($purchaseCategory == "cabletv" OR $purchaseCategory == "education") {
-            if($purchaseCategory == "cabletv") {
-                // Get the cabletvRequest code of the vendor...
-                $vendorRequest = $this->cabletvRequest->getCabletvRequest($productId);
-            } else if($purchaseCategory == "education") {
-                // Get the cabletvRequest code of the vendor...
-                $vendorRequest = $this->eduRequest->getEducationRequest($productId);
-            } else if($purchaseCategory == "electricity") {
-                // Get the cabletvRequest code of the vendor...
-                $vendorRequest = $this->electrictyiRequest->getElectricityRequest($productId);
-            }
-
-            /**
-             * Vendor request is not found
-             * In case of cable tv, education some provider do not have vendor code for topup
-            */
-            if($vendorRequest === false AND self::isExemptCategory($purchaseData['product_id'])) {
-                $this->exemptVendor = true;
-            }
-        } else if($purchaseCategory == "electricity") {
-            // Get the electricity code of the vendor...
+    
+        // Retrieve vendor request based on purchase category
+        $vendorRequest = $this->getVendorRequestByCategory($purchaseCategory, $productId);
+        
+        // Handle exempt vendor logic for certain categories
+        if ($vendorRequest === false && self::isExemptCategory($purchaseData['product_id'])) {
+            $this->exemptVendor = true;
+        }
+        
+        // Specific handling for electricity category
+        if ($purchaseCategory == "electricity") {
             $vendorRequest = $this->electrictyiRequest->getElectricityRequest($productId);
 
-            /**
-             * Vendor request is not found
-             * In case of electricity, some provider do not product code so we exclude it with category...
-            */
-            if($vendorRequest === false AND self::isExemptCategory($purchaseCategory)) {
+            // If vendor request not found and exempted, set the exemptVendor flag
+            if ($vendorRequest === false && self::isExemptCategory($purchaseCategory)) {
                 $this->exemptVendor = true;
             }
-        }
-
-        /**
-         * Vendor Request for airtime, data, cabletv, education and electricity failed or not found...
-         * Vendor is not exempted from the search query
-        */
-        if($vendorRequest === false AND $this->exemptVendor === false) {
-            return $this->sendError("Something unexpected went wrong", [], 500);
         }
 
         if($vendorCode != "local_server") {
@@ -605,17 +580,79 @@ class PurchaseService {
             }
         }
 
-        // Send it to the provider...
-        $sendToProvider = $this->sendToProvider($purchaseData, $theProductApi);
+        // Handle cases where vendor request is not found or exempt
+        if (!$vendorRequest && !self::isExemptCategory($purchaseCategory)) {
+            return $this->sendError("Unexpected error. Vendor request not found", [], 500);
+        }
+    
+        if ($vendorCode !== "local_server" && !$vendorRequest[$vendorCode]) {
+            return $this->sendError("Unexpected error. Vendor code missing", [], 500);
+        }
+    
+        // Calculate balances
+        $userBalance = (float) $transactionData['user_balance'];
+        $sellingPrice = (float) $transactionData['selling_price'];
+        $newUserBalance = $userBalance - $sellingPrice;
+    
+        // Prepare wallet out transaction data
+        $walletOut = [
+            "user_id" => $transactionData["user_id"],
+            "description" => $transactionData["description"],
+            "old_balance" => $userBalance,
+            "amount" => $sellingPrice,
+            "status" => "1",
+            "new_balance" => $newUserBalance,
+            "reference" => $this->uniqueReference,
+        ];
 
-        // return $sendToProvider;
-
-        $transactionData["vendorRequest"] = $vendorRequest;
-        $transactionData["purchase"] = $purchaseData;
-        $transactionData["productInfo"] = $theProduct;
-
-        // Make attempt to submit the record to the database if true otherwise, handle exception...
-        return $this->createPurchase($sendToProvider, $transactionData);
+        // Prepare the transaction data
+        $ussdString = $this->getUSSDString($purchaseCategory, $vendorRequest, $purchaseData, $theProduct);
+        
+        $transactData = [
+            "user_id" => $transactionData["user_id"],
+            "plan" => $transactionData["user_plan_name"],
+            "description" => $transactionData["description"],
+            "extra_info" => $transactionData["extra_info"] ?? NULL,
+            "destination" => $transactionData["recipient"] ?? NULL,
+            "old_balance" => $userBalance,
+            "amount" => $sellingPrice,
+            "new_balance" => $newUserBalance,
+            "costprice" => (float) $transactionData["cost_price"],
+            "category" => $purchaseCategory,
+            "transaction_reference" => NULL,
+            "reference" => $this->uniqueReference,
+            "status" => "0",
+            "ussd_code" => $ussdString,
+            "api_id" => $theProductApi["id"],
+            "channel" => "website"
+        ];
+        
+        // Start database transaction to ensure atomicity
+        DB::beginTransaction();
+    
+        try {
+            // Charge the user wallet
+            $this->walletService->createWallet("outward", $walletOut);
+    
+            // Create transaction record
+            $this->transactService->createTransaction($transactData);
+    
+            // Send the request to the provider
+            $sendToProvider = $this->sendToProvider($purchaseData, $theProductApi);
+    
+            // Attempt to update the order based on provider response
+            $result = $this->updateOrder($this->uniqueReference, $sendToProvider);
+    
+            DB::commit(); // Commit transaction on success
+            return $result;
+            
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction on failure
+            // Log the exception for debugging
+            Log::error('Error in updating request by product ID: ' . $e->getMessage(), ['product_id' => $productId, 'exception' => $e]);
+    
+            return $this->sendError("Something unexpected went wrong", [], 500);
+        }
     }
 
     // Let's send the request to the provider
@@ -650,113 +687,134 @@ class PurchaseService {
         return $submitOrder;
     }
 
-    /**
-     * Store the transaction record
-     * Charges the user after a successful transaction is made.
-     */
-    private function createPurchase($providerResponse, $transactionData) {
+    private function updateOrder($reference, $providerResponse) {
+        $decodeResponse = json_decode($providerResponse->getContent(), true)['data'];
+        DB::beginTransaction();
+        
         try {
-            DB::beginTransaction();
+            // Decode the provider response...
+            $decodeResponse = json_decode($providerResponse->getContent(), true)['data'];
+            
+            // Retrieve the transaction...
+            $transaction = Transaction::where('reference', $reference)->firstOrFail();
 
-            // decode the provider response...
-            $decodeResponse = json_decode($providerResponse->getContent(), true)["data"];
+            // Determine the transaction reference...
+            $transactReference = $decodeResponse['transaction_reference'] ?? 
+                                $decodeResponse['ref'] ?? 
+                                $decodeResponse['reference'] ?? 
+                                null;
 
-            // If Successful...
-            if($providerResponse->getStatusCode() === 200) {
-
-                $purchaseData = $transactionData["purchase"];
-                $theProduct = $transactionData["productInfo"];
-                $theProductApi = $theProduct["api"];
-
-                $ussdString = NULL;
-                $purchaseCategory = $purchaseData["category"];
-
-                if($purchaseCategory == "airtime") {
-                    $ussdString = self::formUSSDString($purchaseCategory, $transactionData["vendorRequest"], [
-                        "phone_number" => $transactionData["recipient"],
-                        "amount" => $purchaseData["amount"],
-                        "product_id" => $theProduct["product_id"]
-                    ]);
-                }
-                else if($purchaseCategory == "data") {
-                    $ussdString = self::formUSSDString($purchaseCategory, $transactionData["vendorRequest"], [
-                        "phone_number" => $transactionData["recipient"],
-                        "product_id" => $theProduct["product_id"]
-                    ]);
-                }
-                
-                $userBalance = (float) $transactionData["user_balance"];
-                $sellingPrice = (float) $transactionData["selling_price"];
-                $newUserBalance = (float) $userBalance - $sellingPrice;
-
-                if(isset($decodeResponse["transaction_reference"])) {
-                    $transactReference = $decodeResponse["transaction_reference"];
-                } else if(isset($decodeResponse["ref"])) {
-                    $transactReference = $decodeResponse["ref"];
-                }  else if(isset($decodeResponse["reference"])) {
-                    $transactReference = $decodeResponse["reference"];
-                } else {
-                    $transactReference = NULL;
-                }
-
-                // Transaction history record...
-                $transactData = [
-                    "user_id" => $transactionData["user_id"],
-                    "plan" => $transactionData["user_plan_name"],
-                    "description" => $transactionData["description"],
-                    "extra_info" => isset($transactionData["extra_info"]) ? $transactionData["extra_info"] : NULL,
-                    "destination" => isset($transactionData["recipient"]) ? $transactionData["recipient"] : NULL,
-                    "old_balance" => (float) $userBalance,
-                    "amount" => (float) $sellingPrice,
-                    "new_balance" => (float) $newUserBalance,
-                    "costprice" => (float) $transactionData["cost_price"],
-                    "category" => $purchaseCategory,
-                    "transaction_reference" => $transactReference,
-                    "reference" => $this->uniqueReference,
-                    "pin_details" => isset($decodeResponse["pin_detail"]) ? json_encode($decodeResponse["pin_detail"]) : NULL,
-                    "token_details" => isset($decodeResponse["token_detail"]) ? json_encode($decodeResponse["token_detail"]) : NULL,
-                    "response" => json_encode($decodeResponse),
-                    "memo" => NULL,
-                    "status" => isset($decodeResponse["delivery_status"]) ? $decodeResponse["delivery_status"] : "0",
-                    "ussd_code" => $ussdString,
-                    "api_id" => $theProductApi["id"],
-                    "channel" => "website"
-                ];
-                
-                $walletOut = [
-                    "user_id" => $transactionData["user_id"],
-                    "description" => $transactionData["description"],
-                    "old_balance" => (float) $userBalance,
-                    "amount" => $sellingPrice,
-                    "status" => isset($decodeResponse["delivery_status"]) ? $decodeResponse["delivery_status"] : "0",
-                    "new_balance" => (float) $newUserBalance,
-                    "reference" => $this->uniqueReference,
-                ];
-
-                // Charge the user wallet...
-                $this->walletService->createWallet("outward", $walletOut);
-
-                // Create transaction record...
-                $this->transactService->createTransaction($transactData);
+            // If successful...
+            if ($providerResponse->getStatusCode() === 200) {
+                $transaction->update([
+                    'transaction_reference' => $transactReference,
+                    'status' => $decodeResponse['delivery_status'] ?? '0',
+                    'pin_details' => isset($decodeResponse['pin_detail']) ? json_encode($decodeResponse['pin_detail']) : null,
+                    'token_details' => isset($decodeResponse['token_detail']) ? json_encode($decodeResponse['token_detail']) : null,
+                    'response' => json_encode($decodeResponse)
+                ]);
 
                 DB::commit();
                 
-                return $this->sendResponse("Success", [
-                        "reference" => $this->uniqueReference,
-                        "amount_charged" => $sellingPrice,
-                        "description" => $transactionData["description"],
-                        "message" => $transactionData["description"]." was successful.",
-                        "new_wallet" => $newUserBalance
-                    ]
-                );
+                return $this->sendResponse('Success', [
+                    'reference' => $reference,
+                    'amount_charged' => $transaction->amount,
+                    'description' => $transaction->description,
+                    'message' => $transaction->description . ' was successful.',
+                    'new_wallet' => $transaction->new_balance
+                ]);
             }
+
+            // Update the transaction as refunded...
+            $transaction->update([
+                'status' => '3',
+                'response' => json_encode($decodeResponse)
+            ]);
+
+            $userId = $transaction->user_id;
+            $userBalance = $this->walletService->getUserBalance($userId);
+            $amountRefund = $transaction->amount;
+            $newUserBalance = $userBalance + $amountRefund;
+
+            $description = 'Refund of ' . str_replace('Purchase of ', '', $transaction->description);
+            $refundReference = 'refund-' . $reference;
+
+            // Create wallet refund...
+            $walletOut = [
+                'user_id' => $userId,
+                'description' => $description,
+                'old_balance' => $userBalance,
+                'amount' => $amountRefund,
+                'status' => '1',
+                'new_balance' => $newUserBalance,
+                'reference' => $refundReference,
+                'channel' => 'website'
+            ];
+            $this->walletService->createWallet('inward', $walletOut);
+
+            // Refund the transaction...
+            $transactData = [
+                'user_id' => $userId,
+                'plan' => $transaction->plan,
+                'description' => $description,
+                'destination' => $transaction->destination,
+                'old_balance' => $userBalance,
+                'amount' => $amountRefund,
+                'new_balance' => $newUserBalance,
+                'costprice' => $amountRefund,
+                'category' => $transaction->category,
+                'transaction_reference' => $transactReference,
+                'reference' => $refundReference,
+                'status' => '4',
+                'api_id' => $transaction->api_id,
+                'channel' => 'website',
+                'response' => 'Wallet refunded'
+            ];
+            $this->transactService->createTransaction($transactData);
+
+            DB::commit();
+            return $this->sendError($decodeResponse, [], 400);
+            
+        } catch (Exception $e) {
             DB::rollBack();
-            return $this->sendError($decodeResponse, [], 500);
+            // Log the error for debugging
+            Log::error('Order Update Failed', ['error' => $e->getMessage(), 'reference' => $reference]);
+            return $this->sendError('An error occurred while updating the order.', [], 500);
         }
-        catch(Exception $e) {
-            // DB::rollBack();
-            return $e->getMessage();
+    }
+        
+    private function getVendorRequestByCategory($category, $productId) {
+        switch ($category) {
+            case 'airtime':
+                return $this->airtimeRequest->getAirtimeRequest($productId);
+            case 'data':
+                return $this->dataRequest->getDataRequest($productId);
+            case 'cabletv':
+                return $this->cabletvRequest->getCabletvRequest($productId);
+            case 'education':
+                return $this->eduRequest->getEducationRequest($productId);
+            case 'electricity':
+                return $this->electrictyiRequest->getElectricityRequest($productId);
+            default:
+                return false;
         }
+    }
+    
+    private function getUSSDString($category, $vendorRequest, $purchaseData, $theProduct) {
+        if ($category === 'airtime') {
+            return self::formUSSDString($category, $vendorRequest, [
+                "phone_number" => $purchaseData["phone_number"],
+                "amount" => $purchaseData["amount"],
+                "product_id" => $theProduct["product_id"]
+            ]);
+        } elseif ($category === 'data') {
+            return self::formUSSDString($category, $vendorRequest, [
+                "phone_number" => $purchaseData["phone_number"],
+                "product_id" => $theProduct["product_id"]
+            ]);
+        }
+
+        return null;
     }
 
     // Creation of USSD String for services with USSD String

@@ -4,6 +4,7 @@ namespace App\Vendors;
 use Exception;
 use App\Classes\HttpRequest;
 use App\Http\Traits\ResponseTrait;
+use Illuminate\Support\Facades\Log;
 
 /**
  * This class is written based on the documentation provided by the provider.
@@ -35,6 +36,7 @@ class Smeplug {
                 ];
                 $processOrder = HttpRequest::sendPost($this->endpoint.'airtime/purchase', $requestPayload, $authHeader);
                 
+                // $processOrder = '{"status": false, "data": {"reference": "011b0400c8668b1934c4", "msg": "NGN50 airtime purchase for 09033024846"}}';
                 return $this->checkPurchaseResponse($processOrder);
             break;
 
@@ -49,6 +51,7 @@ class Smeplug {
                 ];
 
                 $processOrder = HttpRequest::sendPost($this->endpoint.'data/purchase', $requestPayload, $authHeader);
+                // $processOrder = '{"status":false, "msg":"MTN SME portal service is currently unavailable"}';
                 return $this->checkPurchaseResponse($processOrder);
             break;
             
@@ -86,7 +89,7 @@ class Smeplug {
                     OR str_contains(strtolower($decodeMsg), "nin") OR str_contains(strtolower($decodeMsg), "barred")) {
                     return $this->sendError("Error", $decodeMsg, 400);
                 }
-                return $this->sendError("Error", $decode_response, 400);
+                return $this->sendError("Error", $decodeMsg, 400);
             }
         }
         catch(Exception $e) {
