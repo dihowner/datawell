@@ -48,6 +48,10 @@ class UtilityService extends SettingsService {
         return $allSettings->airtimeInfo;
     }
 
+    public function kyc() {
+        return $this->getAllSettings()->kycSettings;
+    }
+
     public function reformEmailAddress($emailAddress) {
 
         // Split the email address into username and domain

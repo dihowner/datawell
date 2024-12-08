@@ -92,7 +92,9 @@ Route::middleware(['auth'])->prefix('user')->group(function() {
         Route::get('/my-profile', 'MyProfile')->name('user.profile');
         Route::get('/bank-account', 'BankInfoView')->name('user.bank-account');
         Route::get('/change-pin-password', 'PinPassView')->name('user.pin-password-view');
+        Route::get('/kyc', 'KycView')->name('user.kyc-view');
 
+        Route::put('submit-kyc', 'submitKycDetails')->name('user.submit-kyc');
         Route::post('/edit-bank-account', 'UpdateUserBank')->name('user.edit-bank-account');
         Route::put('/submit-upgrade-plan', 'UpgradePlan')->name('user.submit-upgrade-plan');
     });

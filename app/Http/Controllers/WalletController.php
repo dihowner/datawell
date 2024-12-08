@@ -142,6 +142,11 @@ class WalletController extends Controller
         return view("main.payment-history", compact('histories'));
     }
 
+    public function reconcilePaymentView()
+    {
+        return [];
+    }
+
     public function approvePayment($id) {
         $approvePayment = $this->walletService->updatePayment($id, "approve");
         $decodeResponse = json_decode($approvePayment->getContent(), true);

@@ -17,7 +17,7 @@ class CategoryService  {
     
     public function getSubCategories($parentCategory) {
         try {
-            $getSubCats = Category::where('parent_category', $parentCategory)->get();
+            $getSubCats = Category::where('parent_category', trim($parentCategory))->get();
             if(count($getSubCats) > 0) {
                 return $getSubCats;
             }

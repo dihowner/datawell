@@ -23,7 +23,7 @@ class SettingsRequest extends FormRequest
      */
     public function rules()
     {
-        // dd($this->has('updateKycCharge'));
+        // dd($this->has('updateKycSettings'));
         if($this->has('updateMonnify')) { // Updating of monnify settings...
             return [
                 "apiKey" => "required|string",
@@ -83,10 +83,11 @@ class SettingsRequest extends FormRequest
                 "etiStatus" => $this->has('etiStatus') ? "required|string":"",
             ];
         }
-        else if($this->has('updateKycCharge')) { // Updating of bank account and charges settings...
+        else if($this->has('updateKycSettings')) { // Updating of bank account and charges settings...
             return [
-                "nin" => "required|numeric",
-                "bvn" => "required|numeric"
+                "nin_charges" => "required|numeric",
+                "bvn_charges" => "required|numeric",
+                "verification_type" => "string",
             ];
         }
     }

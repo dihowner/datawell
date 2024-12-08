@@ -21,8 +21,13 @@ use Illuminate\Support\Facades\Session;
 class PurchaseController extends Controller
 {
     protected $userService, $productService, $categoryController, $purchaseService, $utilityService;
-    public function __construct(UserService $userService, ProductService $productService, CategoryController $categoryController, PurchaseService $purchaseService,
-                                 UtilityService $utilityService){
+    public function __construct(
+        UserService $userService,
+        ProductService $productService,
+        CategoryController $categoryController,
+        PurchaseService $purchaseService,
+        UtilityService $utilityService
+    ) {
         $this->userService = $userService;
         $this->productService = $productService;
         $this->purchaseService = $purchaseService;
@@ -38,35 +43,57 @@ class PurchaseController extends Controller
 
     public function dataMenus()
     {
-        $userDetail = $this->userService->getUserById(Auth::id());
-        $mtnDataCategories = $this->categoryController->getSubCategory('MTN Data Bundle');
-        $airtelDataCategories = $this->categoryController->getSubCategory('Airtel Data Bundle');
-        $gloDataCategories = $this->categoryController->getSubCategory('Glo Data Bundle');
-        
-        $allCatWithSub = $mtnDataCategories->merge($airtelDataCategories)->merge($gloDataCategories);
-        
-        $get9mobile = $this->categoryController->getCategory("Data Bundle");
+        try {
+            // Fetch user details
+            $userDetail = $this->userService->getUserById(Auth::id());
+            
+            // Fetch data categories in parallel to improve performance
+            $mtnDataCategories = $this->categoryController->getSubCategory('MTN Data Bundle');
+            $airtelDataCategories = $this->categoryController->getSubCategory('Airtel Data Bundle');
+            $gloDataCategories = $this->categoryController->getSubCategory('Glo Data Bundle');
+            $etiDataCategories = $this->categoryController->getSubCategory('9mobile Data Bundle');
 
-        $array1 = json_decode($allCatWithSub, true);
-        $array2 = json_decode($get9mobile, true);
-        
-        $dataCategories = collect(array_merge($array1, [$array2]));
+            // Combine all categories into one collection
+            $allCatWithSub = $mtnDataCategories->merge($airtelDataCategories)
+                                            ->merge($gloDataCategories)
+                                            ->merge($etiDataCategories);
 
-        $categoryWithImages = $dataCategories->map(function ($category) {
-            $categoryName = strtolower($category['category_name']) == 'data bundle' ? '9mobile' : $category['category_name'];
-            $category['image'] = $this->utilityService->getProductImage($categoryName);
-            return $category;
-        });
-        
-        return view('private.datamenu', compact('userDetail', 'categoryWithImages'));
+                                            
+            // if 9mobile is not having just one category
+            // $get9mobile = $this->categoryController->getCategory("Data Bundle");
+
+            // $array1 = json_decode($allCatWithSub, true);
+            // $array2 = json_decode($get9mobile, true);
+
+            // $dataCategories = collect(array_merge($array1, [$array2]));
+
+            $dataCategories = $allCatWithSub;
+
+            // Efficiently map categories with their corresponding images
+            $categoryWithImages = $allCatWithSub->map(function ($category) {
+                $categoryName = strtolower($category['category_name']) == 'data bundle' ? '9mobile' : $category['category_name'];
+                // Retrieve image for each category (this could be further optimized with caching if needed)
+                $category['image'] = $this->utilityService->getProductImage($categoryName);
+                return $category;
+            });
+
+            // Return the view with the data
+            return view('private.datamenu', compact('userDetail', 'categoryWithImages'));
+            
+        } catch (\Exception $e) {            
+            // Return a user-friendly message or fallback view
+            return response()->json(['error' => 'Failed to load data menus. Please try again later.'], 500);
+        }
     }
 
-    public function fetchDataBundle($category) {
-        $category = str_replace("-" , " ", $category);
-        
+
+    public function fetchDataBundle($category)
+    {
+        $category = str_replace("-", " ", $category);
+
         $userDetail = $this->userService->getUserById(Auth::id());
         $getDataVolumes = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], $category);
-        
+
         return view('private.buy-data', compact('userDetail', 'getDataVolumes'));
     }
 
@@ -91,7 +118,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $airtimeProducts = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail['plan_id'], 'Airtime Topup');
 
-        if($airtimeProducts === false) {
+        if ($airtimeProducts === false) {
             Alert::error("Error", "Your plan does not have an active Airtime Package linked");
             return redirect()->route('user.index');
         }
@@ -114,14 +141,13 @@ class PurchaseController extends Controller
         $responseCode = $processAirtime->getStatusCode();
         $responseContent = json_decode($processAirtime->content(), true);
 
-        if($responseCode === 200) {
+        if ($responseCode === 200) {
             $message = $responseContent["data"]["message"];
-            $message = $message. " Kindly check your balance";
+            $message = $message . " Kindly check your balance";
             Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
-        }
-        else {
-            $message = $responseContent["message"]. ". Contact support for swift response";
+        } else {
+            $message = $responseContent["message"] . ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
@@ -136,7 +162,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $mtnDataCategories = $this->categoryController->getSubCategory('MTN Data Bundle');
 
-        if(method_exists($mtnDataCategories, 'getStatusCode')) {
+        if (method_exists($mtnDataCategories, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch MTN Data Services");
             return redirect()->route('user.index');
         }
@@ -148,7 +174,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $airtelDataCategories = $this->categoryController->getSubCategory('Airtel Data Bundle');
 
-        if(method_exists($airtelDataCategories, 'getStatusCode')) {
+        if (method_exists($airtelDataCategories, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch Airtel Data Services");
             return redirect()->route('user.index');
         }
@@ -160,7 +186,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $gloDataCategories = $this->categoryController->getSubCategory('Glo Data Bundle');
 
-        if(method_exists($gloDataCategories, 'getStatusCode')) {
+        if (method_exists($gloDataCategories, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch Glo Data Services");
             return redirect()->route('user.index');
         }
@@ -191,19 +217,18 @@ class PurchaseController extends Controller
         $transactPin = $dataData['transactpin'];
 
         $processData = $this->purchaseService->purchaseData($productId, $phoneNumber, $transactPin);
-        
+
         // return $processData;
 
         $responseCode = $processData->getStatusCode();
         $responseContent = json_decode($processData->content(), true);
 
-        if($responseCode === 200) {
+        if ($responseCode === 200) {
             $message = $responseContent["data"]["message"];
-            $message = $message. " Kindly check your balance";
+            $message = $message . " Kindly check your balance";
             Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
-        }
-        else {
+        } else {
             $message = $responseContent["message"] . ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
@@ -220,7 +245,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $dstvCategories = $this->categoryController->getSubCategory('Dstv');
 
-        if($dstvCategories == NULL OR method_exists($dstvCategories, 'getStatusCode')) {
+        if ($dstvCategories == NULL or method_exists($dstvCategories, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch Dstv Services");
             return redirect()->route('user.index');
         }
@@ -232,7 +257,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $gotvCategories = $this->categoryController->getSubCategory('Gotv');
 
-        if($gotvCategories == NULL OR method_exists($gotvCategories, 'getStatusCode')) {
+        if ($gotvCategories == NULL or method_exists($gotvCategories, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch Gotv Services");
             return redirect()->route('user.index');
         }
@@ -244,7 +269,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $startimesPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "Startimes");
 
-        if($startimesPackages == NULL OR method_exists($startimesPackages, 'getStatusCode')) {
+        if ($startimesPackages == NULL or method_exists($startimesPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch Startimes Services");
             return redirect()->route('user.index');
         }
@@ -252,7 +277,8 @@ class PurchaseController extends Controller
         return view('private.buy-startimes', compact('userDetail', 'startimesPackages'));
     }
 
-    public function verifyDecoder(ServiceVerifyRequest $request) {
+    public function verifyDecoder(ServiceVerifyRequest $request)
+    {
         if (!$request->validated()) {
             $errors = $request->validator->getMessageBag()->toArray();
             return response()->json(['errors' => $errors], 422);
@@ -270,23 +296,22 @@ class PurchaseController extends Controller
         $transactPin = $cableData['transactpin'];
         $optionalData['amount'] = isset($cableData['amount']) ? $cableData['amount'] : 0;
         $optionalData['customer_name'] = $cableData['customer_name'];
-        if(isset($cableData['customer_number'])) {
+        if (isset($cableData['customer_number'])) {
             $optionalData['customer_number'] = $cableData['customer_number'];
         }
 
         $processCableTv = $this->purchaseService->purchaseCableTv($productId, $smartNumber, $transactPin, $optionalData);
         $responseCode = $processCableTv->getStatusCode();
-        
+
         $responseContent = json_decode($processCableTv->content(), true);
 
-        if($responseCode === 200) {
+        if ($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message;
             Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
-        }
-        else {
-            $message = $responseContent["message"]. ". Contact support for swift response";
+        } else {
+            $message = $responseContent["message"] . ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
@@ -301,7 +326,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $waecPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "Waec");
 
-        if($waecPackages == NULL OR method_exists($waecPackages, 'getStatusCode')) {
+        if ($waecPackages == NULL or method_exists($waecPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch WAEC Services");
             return redirect()->route('user.index');
         }
@@ -314,7 +339,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $necoPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "Neco");
 
-        if($necoPackages == NULL OR method_exists($necoPackages, 'getStatusCode')) {
+        if ($necoPackages == NULL or method_exists($necoPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch NECO Services");
             return redirect()->route('user.index');
         }
@@ -334,14 +359,13 @@ class PurchaseController extends Controller
         $responseCode = $processEducation->getStatusCode();
         $responseContent = json_decode($processEducation->content(), true);
 
-        if($responseCode === 200) {
+        if ($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message;
             Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
-        }
-        else {
-            $message = $responseContent["message"]. ". Contact support for swift response";
+        } else {
+            $message = $responseContent["message"] . ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();
@@ -356,7 +380,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $ibedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "IBEDC (IBADAN)");
 
-        if($ibedcPackages == NULL OR method_exists($ibedcPackages, 'getStatusCode')) {
+        if ($ibedcPackages == NULL or method_exists($ibedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch IBEDC (IBADAN) Services");
             return redirect()->route('user.index');
         }
@@ -369,7 +393,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $phedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "PHEDC (PORTHARCOURT)");
 
-        if($phedcPackages == NULL OR method_exists($phedcPackages, 'getStatusCode')) {
+        if ($phedcPackages == NULL or method_exists($phedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch PHEDC (PORTHARCOURT) Services");
             return redirect()->route('user.index');
         }
@@ -382,7 +406,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $aedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "AEDC (ABUJA)");
 
-        if($aedcPackages == NULL OR method_exists($aedcPackages, 'getStatusCode')) {
+        if ($aedcPackages == NULL or method_exists($aedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch AEDC (ABUJA) Services");
             return redirect()->route('user.index');
         }
@@ -395,7 +419,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $kedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "KEDC (KANO)");
 
-        if($kedcPackages == NULL OR method_exists($kedcPackages, 'getStatusCode')) {
+        if ($kedcPackages == NULL or method_exists($kedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch KEDC (KANO) Services");
             return redirect()->route('user.index');
         }
@@ -408,7 +432,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $kaedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "KAEDC (KADUNA)");
 
-        if($kaedcPackages == NULL OR method_exists($kaedcPackages, 'getStatusCode')) {
+        if ($kaedcPackages == NULL or method_exists($kaedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch KAEDC (KADUNA) Services");
             return redirect()->route('user.index');
         }
@@ -421,7 +445,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $eedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "EEDC (ENUGU)");
 
-        if($eedcPackages == NULL OR method_exists($eedcPackages, 'getStatusCode')) {
+        if ($eedcPackages == NULL or method_exists($eedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch EEDC (ENUGU) Services");
             return redirect()->route('user.index');
         }
@@ -434,7 +458,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $jedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "JEDC (JOS)");
 
-        if($jedcPackages == NULL OR method_exists($jedcPackages, 'getStatusCode')) {
+        if ($jedcPackages == NULL or method_exists($jedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch JEDC (JOS) Services");
             return redirect()->route('user.index');
         }
@@ -447,7 +471,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $ekedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "EKEDC (EKO)");
 
-        if($ekedcPackages == NULL OR method_exists($ekedcPackages, 'getStatusCode')) {
+        if ($ekedcPackages == NULL or method_exists($ekedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch EKEDC (EKO) Services");
             return redirect()->route('user.index');
         }
@@ -460,7 +484,7 @@ class PurchaseController extends Controller
         $userDetail = $this->userService->getUserById(Auth::id());
         $ikedcPackages = $this->productService->getAllProductPriceWithPlanAndCategory($userDetail["plan_id"], "IKEDC (IKEJA)");
 
-        if($ikedcPackages == NULL OR method_exists($ikedcPackages, 'getStatusCode')) {
+        if ($ikedcPackages == NULL or method_exists($ikedcPackages, 'getStatusCode')) {
             Alert::error("Error", "Something went wrong. Unable to fetch IKEDC (IKEJA) Services");
             return redirect()->route('user.index');
         }
@@ -468,7 +492,8 @@ class PurchaseController extends Controller
         return view('private.buy-ikedc-bills', compact('userDetail', 'ikedcPackages'));
     }
 
-    public function verifyMeterNumber(ServiceVerifyRequest $request) {
+    public function verifyMeterNumber(ServiceVerifyRequest $request)
+    {
         if (!$request->validated()) {
             $errors = $request->validator->getMessageBag()->toArray();
             return response()->json(['errors' => $errors], 422);
@@ -488,27 +513,27 @@ class PurchaseController extends Controller
         $optionalData['customer_name'] = $electricData['customer_name'];
         $optionalData['customer_address'] = $electricData['customer_address'];
 
-        if(isset($electricData['customer_details'])) {
+        if (isset($electricData['customer_details'])) {
             $optionalData['customer_details'] = $electricData['customer_details'];
         }
 
-        if(isset($electricData['customer_reference_id'])) {
+        if (isset($electricData['customer_reference_id'])) {
             $optionalData['customer_reference_id'] = $electricData['customer_reference_id'];
         }
 
-        if(isset($electricData['customer_tariff_code'])) {
+        if (isset($electricData['customer_tariff_code'])) {
             $optionalData['customer_tariff_code'] = $electricData['customer_tariff_code'];
         }
 
-        if(isset($electricData['customer_access_code'])) {
+        if (isset($electricData['customer_access_code'])) {
             $optionalData['customer_access_code'] = $electricData['customer_access_code'];
         }
 
-        if(isset($electricData['customer_dt_number'])) {
+        if (isset($electricData['customer_dt_number'])) {
             $optionalData['customer_dt_number'] = $electricData['customer_dt_number'];
         }
 
-        if(isset($electricData['customer_account_type'])) {
+        if (isset($electricData['customer_account_type'])) {
             $optionalData['customer_account_type'] = $electricData['customer_account_type'];
         }
 
@@ -517,14 +542,13 @@ class PurchaseController extends Controller
         $responseCode = $processElectricity->getStatusCode();
         $responseContent = json_decode($processElectricity->content(), true);
 
-        if($responseCode === 200) {
+        if ($responseCode === 200) {
             $message = $responseContent["data"]["message"];
             $message = $message;
             Session::flash('rate_us', true);
             Alert::success("Success", $message)->autoClose(10000);
-        }
-        else {
-            $message = $responseContent["message"]. ". Contact support for swift response";
+        } else {
+            $message = $responseContent["message"] . ". Contact support for swift response";
             Alert::error("Error", $message)->autoClose(10000);
         }
         return redirect()->back();

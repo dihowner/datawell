@@ -147,6 +147,11 @@
                                             </p>
                                         </div>
                                         <div class="card-footer">
+                                            @if ($use_bvn OR $use_nin)
+                                                <a class="btn btn-primary" href="{{ route('user.kyc-view') }}">
+                                                    <b> <i class="fa fa-paper-plane-o"></i> Apply For KYC</b>
+                                                </a>
+                                            @endif
                                             @if (!isset($userMeta['monnify']))
                                                 <a class="btn btn-danger" href="{{ route('user.generate-va') }}">
                                                     <b> <i class="fa fa-paper-plane-o"></i> Generate Virtual Account</b>

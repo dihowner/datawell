@@ -57,7 +57,7 @@ Route::prefix('main')->group(function() {
             Route::put('/update-airtime-info', "updateAirtimeInfo")->name('update-airtime-info');
             Route::put('/update-restrict-vending', "updateVendRestriction")->name('update-restrict-vending');
             Route::put('/update-airtime-conversion', "updateAirtimeConversion")->name('update-airtime-conversion');
-            Route::put('/update-kyc-charge', "updateKycCharge")->name('update-kyc-charge');
+            Route::put('/update-kyc-charge', "updateKycSettings")->name('update-kyc-charge');
         });
 
         Route::controller(UserController::class)->group(function() {
@@ -151,6 +151,7 @@ Route::prefix('main')->group(function() {
 
         Route::controller(WalletController::class)->group(function() {
             Route::get("/payment-history", "paymentHistory")->name('payment-history');
+            Route::get("/account-reconciliation", "reconcilePaymentView")->name('account-reconciliation');
             Route::get("/payment/{id}/approve", "approvePayment");
             Route::get("/payment/{id}/decline", "declinePayment");
         });

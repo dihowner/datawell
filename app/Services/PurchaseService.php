@@ -639,7 +639,6 @@ class PurchaseService {
     
             // Send the request to the provider
             $sendToProvider = $this->sendToProvider($purchaseData, $theProductApi);
-    
             // Attempt to update the order based on provider response
             $result = $this->updateOrder($this->uniqueReference, $sendToProvider);
     
@@ -688,29 +687,30 @@ class PurchaseService {
     }
 
     private function updateOrder($reference, $providerResponse) {
-        $decodeResponse = json_decode($providerResponse->getContent(), true)['data'];
+        // Start database transaction to ensure atomicity
         DB::beginTransaction();
         
         try {
             // Decode the provider response...
-            $decodeResponse = json_decode($providerResponse->getContent(), true)['data'];
+            $decodeResponse = json_decode($providerResponse->getContent(), true);
+            $decodeData = $decodeResponse['data'] ?? null;
             
             // Retrieve the transaction...
             $transaction = Transaction::where('reference', $reference)->firstOrFail();
 
             // Determine the transaction reference...
-            $transactReference = $decodeResponse['transaction_reference'] ?? 
-                                $decodeResponse['ref'] ?? 
-                                $decodeResponse['reference'] ?? 
+            $transactReference = $decodeData['transaction_reference'] ?? $decodeData['ref'] ?? 
+                                $decodeData['reference'] ?? $decodeData['data']['reference'] ??
+                                $decodeData['data']['recharge_id'] ?? 
                                 null;
 
             // If successful...
             if ($providerResponse->getStatusCode() === 200) {
                 $transaction->update([
                     'transaction_reference' => $transactReference,
-                    'status' => $decodeResponse['delivery_status'] ?? '0',
-                    'pin_details' => isset($decodeResponse['pin_detail']) ? json_encode($decodeResponse['pin_detail']) : null,
-                    'token_details' => isset($decodeResponse['token_detail']) ? json_encode($decodeResponse['token_detail']) : null,
+                    'status' => $decodeData['delivery_status'] ?? '0',
+                    'pin_details' => isset($decodeData['pin_detail']) ? json_encode($decodeData['pin_detail']) : null,
+                    'token_details' => isset($decodeData['token_detail']) ? json_encode($decodeResponse['token_detail']) : null,
                     'response' => json_encode($decodeResponse)
                 ]);
 
@@ -773,12 +773,13 @@ class PurchaseService {
             $this->transactService->createTransaction($transactData);
 
             DB::commit();
-            return $this->sendError($decodeResponse, [], 400);
+            $failureMesage = $decodeResponse["message"] ?? "Transaction failed";
+            return $this->sendError($failureMesage, [], 400);
             
         } catch (Exception $e) {
-            DB::rollBack();
+            // DB::rollBack();
             // Log the error for debugging
-            Log::error('Order Update Failed', ['error' => $e->getMessage(), 'reference' => $reference]);
+            Log::error('Order Update Failed', ['error' => $e, 'reference' => $reference]);
             return $this->sendError('An error occurred while updating the order.', [], 500);
         }
     }

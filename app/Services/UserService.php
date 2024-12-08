@@ -2,8 +2,11 @@
 namespace App\Services;
 
 use Exception;
+use Carbon\Carbon;
+use App\Models\KYC;
 use App\Models\User;
 use App\Models\UserMeta;
+use App\Helpers\EncryptorHelper;
 use App\Http\Traits\ResponseTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -116,19 +119,34 @@ class UserService extends SettingsService {
      */
     public function GenerateUserVirtualAccount(int $userId) {
         try {
+
+            $existingKYC = KYC::where('user_id', $userId)->first();
+
+            if (!$existingKYC) {
+                return $this->sendError("Please perform KYC verification first", [], 400);
+            }
+
             $theAuthorizedUser = $this->getUserById($userId);
             $reservedReference = $this->utilityService->uniqueReference();
 
-            $generateVirtualAccount = $this->monnifyService->generateVirtualAccount([
+            $monnifyData = [
                 "user_id" => $theAuthorizedUser->id,
                 "username" => $theAuthorizedUser->username,
                 "email_address" => $theAuthorizedUser->emailaddress,
                 "reference" => $reservedReference
-            ]);
+            ];
 
-            if(!is_array($generateVirtualAccount)) {
-                $decodeResult = json_decode($generateVirtualAccount);
-                $this->responseBody = $this->sendError("Error", $decodeResult->message, 400);
+            if (strtolower($existingKYC['bvn_status']) == "verified") {
+                $monnifyData['bvn'] = $existingKYC['bvn_number'];
+            }
+            if (strtolower($existingKYC['nin_status']) == "verified") {
+                $monnifyData['nin'] = $existingKYC['nin_number'];
+            }
+
+            $generateVirtualAccount = $this->monnifyService->generateVirtualAccount($monnifyData);
+
+            if(!$generateVirtualAccount['status']) {
+                $this->responseBody = $this->sendError($generateVirtualAccount['message'], [], 400);
             } else {
                 // Since virtual account is generated, then we need to update the old record from DB...
                 if(isset($theAuthorizedUser->user_meta["monnify"])) {
@@ -394,4 +412,320 @@ class UserService extends SettingsService {
         return $this->sendError("Error updating request", [], 400);
     }
 
+    public function verifyBVN($userId, $bvnName, $bvnNumber, $bvnPhoneNumber, $dateOfBirth)
+    {
+        return DB::transaction(function () use ($userId, $bvnName, $bvnNumber, $bvnPhoneNumber, $dateOfBirth) {
+            $user = $this->getUserById($userId);
+            $wallet_service_instance = new WalletService(new UtilityService());
+            $userBalance = (float) $wallet_service_instance->getUserBalance($userId);
+            $encryptionKey = config('app.encryption_key');
+
+            $kycSettings = $this->getSettingsByName('kycSettings');
+            if ($kycSettings === false) {
+                return $this->sendError('KYC Charges not set, kindly inform Admin', [], 400);
+            }
+            $kycSettings = json_decode($kycSettings['content'], true);
+            $bvnCharge = $kycSettings['bvn'] ?? 0;
+            $verificationType = $kycSettings['verification_type'] ?? "disabled";
+
+            if ($bvnCharge > $userBalance) {
+                return $this->sendError("Insufficient wallet balance. Kindly fund your account", [], 400);
+            }
+
+            if ($verificationType == "disabled") {
+                return $this->sendError("KYC Verification is currently disabled", [], 400);
+            }
+
+            $newUserBalance = (float) $userBalance - $bvnCharge;
+            $walletOut = [
+                "user_id" => $userId,
+                "description" => "Account BVN Verification",
+                "old_balance" => (float) $userBalance,
+                "amount" => $bvnCharge,
+                "status" => "1",
+                "new_balance" => (float) $newUserBalance,
+                "reference" => app(UtilityService::class)->uniqueReference()
+            ];
+
+            if ($encryptionKey !== false) {
+                $verifyBvn = $this->monnifyService->verify_bvn($bvnName, $bvnNumber, $bvnPhoneNumber, $dateOfBirth);
+                $decodeBVN = is_array($verifyBvn) ? $verifyBvn : json_decode((string) $verifyBvn, true);
+
+                if (isset($decodeBVN['requestSuccessful']) && $decodeBVN['requestSuccessful'] === true) {
+                    $responseBody = $decodeBVN['responseBody'];
+                    $matchStatus = $responseBody['name']['matchStatus'];
+                    
+                    $nameOnBvn = $bvnName;
+                    $anyNameMatch = $this->nameMatch($nameOnBvn, $user->fullname);
+                    $existingKYC = KYC::where('user_id', $userId)->first();
+                    $ninStatus = $existingKYC ? $existingKYC->nin_status : 'pending';
+                    $encryptorHelper = new EncryptorHelper();
+
+                    if (in_array($verificationType, ['use_bvn_or_nin', 'use_bvn']) && ($matchStatus == "FULL_MATCH" || $matchStatus == "PARTIAL_MATCH")) {
+                        $bvnNumber = $encryptorHelper->encryptCredential($bvnNumber);
+                        $bvnPhoneNumber = $encryptorHelper->encryptCredential($bvnPhoneNumber);
+
+                        $bvnMeta = json_encode([
+                            'bvn_number' => $bvnNumber,
+                            'bvn_name' => $bvnName,
+                            'bvn_dob' => $dateOfBirth,
+                            'bvn_response' => $decodeBVN,
+                            'bvn_phone' => $bvnPhoneNumber,
+                            'verification_type' => $verificationType
+                        ]);
+
+                        $createUpdateKyc = KYC::updateOrCreate(
+                            ['user_id' => $userId],
+                            [
+                                'bvn_number' => $bvnNumber,
+                                'bvn_name' => $bvnName,
+                                'bvn_dob' => $dateOfBirth,
+                                'bvn_status' => 'verified',
+                                'bvn_response' => json_encode($decodeBVN),
+                                'bvn_data' => $bvnMeta,
+                                'bvn_date_verified' => Carbon::now(),
+                                'nin_status' => $ninStatus
+                            ]
+                        );
+
+                        if (!$createUpdateKyc) {
+                            return $this->sendError('Unable to save KYC details', [], 400);
+                        }
+
+                        $chargeUser = $wallet_service_instance->createWallet("outward", $walletOut);
+
+                        if (!$chargeUser) {
+                            return $this->sendError('Unable to charge user wallet. Kindly try again', [], 400);
+                        }
+
+                        return $this->sendResponse('Your account has been verified successfully. You can now enjoy our unlimited services', $bvnMeta);
+                    } else if ($anyNameMatch == "FULL_MATCH" || $anyNameMatch == "PARTIAL_MATCH") {
+                        $bvnNumber = $encryptorHelper->encryptCredential($bvnNumber);
+                        $bvnPhoneNumber = $encryptorHelper->encryptCredential($bvnPhoneNumber);
+
+                        $bvnMeta = json_encode([
+                            'bvn_number' => $bvnNumber,
+                            'bvn_name' => $bvnName,
+                            'bvn_dob' => $dateOfBirth,
+                            'bvn_response' => $decodeBVN,
+                            'bvn_phone' => $bvnPhoneNumber,
+                            'verification_type' => $verificationType
+                        ]);
+
+                        $createUpdateKyc = KYC::updateOrCreate(
+                            ['user_id' => $userId],
+                            [
+                                'bvn_number' => $bvnNumber,
+                                'bvn_name' => $bvnName,
+                                'bvn_dob' => $dateOfBirth,
+                                'bvn_status' => 'verified',
+                                'bvn_response' => json_encode($decodeBVN),
+                                'bvn_data' => $bvnMeta,
+                                'bvn_date_verified' => Carbon::now(),
+                                'nin_status' => $ninStatus
+                            ]
+                        );
+
+                        if (!$createUpdateKyc) {
+                            return $this->sendError('Unable to save KYC details', [], 400);
+                        }
+
+                        $chargeUser = $wallet_service_instance->createWallet("outward", $walletOut);
+
+                        if (!$chargeUser) {
+                            return $this->sendError('Unable to charge user wallet. Kindly try again', [], 400);
+                        }
+
+                        return $this->sendResponse('Your account has been verified successfully. You can now enjoy our unlimited services', $bvnMeta);
+                    }
+
+                    return $this->sendError("Verification was successful. Your profile details with us mismatch with your BVN information", [], 400);
+                }
+
+                return $this->sendError('Error verifying BVN information supplied', [], 400);
+            }
+
+            return $this->sendError('Internal server error. Kindly notify admin', [], 400);
+        });
+    }
+
+
+    public function verifyNIN($userId, $ninName, $ninNumber, $ninPhoneNumber, $dateOfBirth)
+    {
+        $user = $this->getUserById($userId);
+        $wallet_service_instance = new WalletService(new UtilityService());
+        $userBalance = (float) $wallet_service_instance->getUserBalance($userId);
+
+        $kycSettings = $this->getSettingsByName('kycSettings');
+        if ($kycSettings === false) {
+            return $this->sendError('KYC Charges not set, kindly inform Admin', [], 400);
+        }
+        $kycSettings = json_decode($kycSettings['content'], true);
+        $ninCharge = isset($kycSettings['nin']) ? $kycSettings['nin'] : 0;
+        $verificationType = isset($kycSettings['verification_type']) ? $kycSettings['verification_type'] : "disabled";
+
+        if ($ninCharge > $userBalance) {
+            return $this->sendError("Insufficient wallet balance. Kindly fund your account", [], 400);
+        }
+
+        if ($verificationType == "disabled") {
+            return $this->sendError("KYC Verification is currently disabled", [], 400);
+        }
+
+        return DB::transaction(function () use ($userId, $ninName, $ninNumber, $ninPhoneNumber, $dateOfBirth, $user, $wallet_service_instance, $userBalance, $ninCharge, $verificationType) {        
+            $encryptionKey = config('app.encryption_key');
+            $newUserBalance = (float) $userBalance - $ninCharge;
+            $walletOut = [
+                "user_id" => $userId,
+                "description" => "Account NIN Verification",
+                "old_balance" => (float) $userBalance,
+                "amount" => $ninCharge,
+                "status" => "1",
+                "new_balance" => (float) $newUserBalance,
+                "reference" => app(UtilityService::class)->uniqueReference()
+            ];
+
+            if ($encryptionKey !== false) {
+                $verifyNin = $this->monnifyService->verify_nin($ninName, $ninNumber, $ninPhoneNumber, $dateOfBirth);
+                $decodeNIN = is_array($verifyNin) ? $verifyNin : json_decode((string) $verifyNin, true);
+
+                if (isset($decodeNIN['requestSuccessful']) && $decodeNIN['requestSuccessful'] === true) {
+                    $responseBody = $decodeNIN['responseBody'];
+                    $lastName = isset($responseBody['lastName']) ? $responseBody['lastName'] : '';
+                    $firstName = isset($responseBody['firstName']) ? $responseBody['firstName'] : '';
+                    $middleName = isset($responseBody['middleName']) ? $responseBody['middleName'] : '';
+                    $nameOnNin = strtoupper($lastName . ' '. $firstName . ' '. $middleName);
+
+                    $useNameMatch = $this->nameMatch($user->fullname, $ninName);
+                    $anyNameMatch = $this->nameMatch($nameOnNin, $ninName);
+                    $encryptorHelper = new EncryptorHelper();
+
+                    $existingKYC = KYC::where('user_id', $userId)->first();
+                    $bvnStatus = $existingKYC ? $existingKYC->bvn_status : 'pending';
+
+                    if (in_array($verificationType, ['use_bvn_or_nin', 'use_nin']) && ($useNameMatch == "FULL_MATCH" || $useNameMatch == "PARTIAL_MATCH")) {
+                        $ninNumber = $encryptorHelper->encryptCredential($ninNumber);
+                        $ninPhoneNumber = $encryptorHelper->encryptCredential($ninPhoneNumber);
+
+                        $ninMeta = json_encode([
+                            'nin_number' => $ninNumber,
+                            'nin_name' => $ninName,
+                            'nin_dob' => $dateOfBirth,
+                            'nin_response' => $decodeNIN,
+                            'nin_phone' => $ninPhoneNumber,
+                            'verification_type' => $verificationType
+                        ]);
+
+                        $createUpdateKyc = KYC::updateOrCreate(
+                            ['user_id' => $userId],
+                            [
+                                'nin_number' => $ninNumber,
+                                'nin_name' => $ninName,
+                                'nin_dob' => $dateOfBirth,
+                                'nin_status' => 'verified',
+                                'nin_response' => json_encode($decodeNIN),
+                                'nin_data' => $ninMeta,
+                                'nin_date_verified' => Carbon::now(),
+                                'bvn_status' => $bvnStatus
+                            ]
+                        );
+
+                        if (!$createUpdateKyc) {
+                            return $this->sendError("Unable to save KYC details", [], 400);
+                        }
+
+                        $chargeUser = $wallet_service_instance->createWallet("outward", $walletOut);
+
+                        if (!$chargeUser) {
+                            return $this->sendError("Unable to charge user wallet", [], 400);
+                        }
+
+                        return $this->sendResponse('Your account has been verified successfully. You can now enjoy our unlimited services', $ninMeta);
+                    } else if ($anyNameMatch == "FULL_MATCH" || $anyNameMatch == "PARTIAL_MATCH") {
+                        $ninNumber = $encryptorHelper->encryptCredential($ninNumber);
+                        $ninPhoneNumber = $encryptorHelper->encryptCredential($ninPhoneNumber);
+
+                        $ninMeta = json_encode([
+                            'nin_number' => $ninNumber,
+                            'nin_name' => $ninName,
+                            'nin_dob' => $dateOfBirth,
+                            'nin_response' => $decodeNIN,
+                            'nin_phone' => $ninPhoneNumber,
+                            'verification_type' => $verificationType
+                        ]);
+
+                        $createUpdateKyc = KYC::updateOrCreate(
+                            ['user_id' => $userId],
+                            [
+                                'nin_number' => $ninNumber,
+                                'nin_name' => $ninName,
+                                'nin_dob' => $dateOfBirth,
+                                'nin_status' => 'verified',
+                                'nin_response' => json_encode($decodeNIN),
+                                'nin_data' => $ninMeta,
+                                'nin_date_verified' => Carbon::now(),
+                                'bvn_status' => $bvnStatus
+                            ]
+                        );
+
+                        if (!$createUpdateKyc) {
+                            return $this->sendError("Unable to save KYC details", [], 400);
+                        }
+
+                        $chargeUser = $wallet_service_instance->createWallet("outward", $walletOut);
+
+                        if (!$chargeUser) {
+                            return $this->sendError("Unable to charge user wallet", [], 400);
+                        }
+
+                        return $this->sendResponse('Your account has been verified successfully. You can now enjoy our unlimited services', $ninMeta);
+                    }
+
+                    return $this->sendError("Verification was successful. Your profile details with us mismatch with your NIN information", [], 400);
+                }
+
+                return $this->sendError("Error verifying NIN Information", [], 400);
+            }
+
+            return $this->sendError("Internal server error. Kindly notify admin", [], 400);
+        });
+    }
+
+
+    private function nameMatch($name1, $name2) {
+        // Split the names into parts
+        $parts1 = explode(" ", trim($name1));
+        $parts2 = explode(" ", trim($name2));
+        
+        // Initialize counters for full and partial matches
+        $fullMatches = 0;
+        $partialMatches = 0;
+        
+        // Loop through each part of the first name
+        foreach ($parts1 as $part1) {
+            // Loop through each part of the second name
+            foreach ($parts2 as $part2) {
+                // Check if the parts match
+                if (strcasecmp($part1, $part2) === 0) {
+                    // If they match, increment the appropriate counter
+                    if (strlen($part1) == strlen($part2)) {
+                        $fullMatches++;
+                    } else {
+                        $partialMatches++;
+                    }
+                    // No need to check further for this part
+                    break;
+                }
+            }
+        }  
+        
+        // Determine the overall match result
+        if ($fullMatches == count($parts1) AND $fullMatches == count($parts2)) {
+            return "FULL_MATCH";
+        } elseif ($fullMatches > 0 || $partialMatches > 0) {
+            return "PARTIAL_MATCH";
+        } else {
+            return "NO_MATCH";
+        }
+    }
 }

@@ -4,7 +4,6 @@ namespace App\Vendors;
 use Exception;
 use App\Classes\HttpRequest;
 use App\Http\Traits\ResponseTrait;
-use Illuminate\Support\Facades\Log;
 
 /**
  * This class is written based on the documentation provided by the provider.
@@ -35,7 +34,8 @@ class Ipay {
                     "api_key" => $apiDetails['api_public_key']
                 ];
                 $processOrder = HttpRequest::sendPost($this->endpoint.'airtime/index.php', $requestPayload, $authHeader);
-                
+                // $processOrder = '{"server_message":"Transaction was successful, sum of 48.00 was deducted from your wallet. Kindly check your balance","status":true,"error_code":1986,"data":{"customer_name":null,"customer_address":null,"reference":null,"meter_number":null,"token":null,"amount":null,"units":null,"recharge_id":2874646,"amount_charged":"50.00","quantity":1,"after_balance":"57739.05","true_response":"VTU vending N50.00 for 09033024846","text_status":"COMPLETED","bonus_earned":"2.00"},"data_result":[],"error_data":[],"text_status":"COMPLETED","error":null}';
+                // $processOrder = '{"server_message":"Transaction Failed","status":false,"error_code":1982,"data":{"recharge_id":2874642,"amount_charged":0,"quantity":1,"after_balance":"57789.05","true_response":"Invalid MSISDN","text_status":"FAILED","bonus_earned":0},"data_result":[],"error_data":[],"text_status":"FAILED","error":null}';
                 return $this->checkPurchaseResponse($processOrder);
             break;
 
@@ -49,6 +49,7 @@ class Ipay {
                 ];
 
                 $processOrder = HttpRequest::sendPost($this->endpoint.'datashare/index.php', $requestPayload, $authHeader);
+                // $processOrder = '{"server_message":"Transaction was successful, sum of 128.00 was deducted from your wallet. Kindly check your balance","status":true,"error_code":1986,"data":{"customer_name":null,"customer_address":null,"reference":null,"meter_number":null,"token":null,"amount":null,"units":null,"recharge_id":2862827,"amount_charged":"128.00","quantity":1,"after_balance":"58141.05","true_response":"Dear Customer, You have successfully shared 500MB Data to 2349033024846. Your new  data balance is 52260.7GB expires 07\/11\/2024. Thank\u00a0you.","text_status":"COMPLETED","bonus_earned":"372.00"},"data_result":[],"error_data":[],"text_status":"COMPLETED","error":null}';
                 return $this->checkPurchaseResponse($processOrder);
             break;
             
@@ -65,14 +66,14 @@ class Ipay {
 
     private function checkPurchaseResponse($apiResponse) {
         try {
-
             $decode_response = is_array($apiResponse) ? $apiResponse : json_decode($apiResponse, true);
-            
+
             $orderStatus = $decode_response['status'];
             $textStatus = $decode_response['text_status'];
             $trueResponse = $decode_response['data']['true_response'];
             if ($orderStatus === true) {
-                $reformResponse['message'] = $trueResponse ?? "Transaction successful. ";
+                $trueResponse = $trueResponse ?? "Transaction successful.";
+                $reformResponse['message'] = $trueResponse;
                 if(str_contains(strtolower($textStatus), "pend")) {
                     $reformResponse = $decode_response;
                     $reformResponse['delivery_status'] = "2";
@@ -88,12 +89,12 @@ class Ipay {
                 $decodeMsg = $trueResponse ?? "Unknown error. Please try again, or contact support if the error persists.";
                 if (str_contains(strtolower($decodeMsg), "is lower") OR str_contains(strtolower($decodeMsg), "minimum") 
                     OR str_contains(strtolower($decodeMsg), "nin") OR str_contains(strtolower($decodeMsg), "barred")) {
-                    return $this->sendError("Error", $decodeMsg, 400);
+                    return $this->sendError($decodeMsg, [], 400);
                 } 
                 else if (str_contains(strtolower($decodeMsg), "msisdn")) {
-                    return $this->sendError("Error", "Invalid phone number provided. Please provide a valid phone number", 400);
+                    return $this->sendError("Mobile number does not belong to this network operator", [], 400);
                 }
-                return $this->sendError("Error", "Transaction failed", 400);
+                return $this->sendError("Transaction failed", [], 400);
             }
         }
         catch(Exception $e) {

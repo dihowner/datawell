@@ -10,6 +10,7 @@
     $airtimeInfo = json_decode($UtilityService->airtimeInfo(), true);
     $airtimeConversion = json_decode($UtilityService->airtimeConversion(), true);
     $vendingRestriction = json_decode($UtilityService->vendingRestriction(), true);
+    $kycSettings = json_decode($UtilityService->kyc());
     
     $mtnConversion = $airtimeConversion['mtn'];
     $airtelConversion = $airtimeConversion['airtel'];
@@ -554,6 +555,68 @@
                                                 </div>
                                             </div>
 
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="text-center">
+                                            <button class="btn btn-danger btn-lg btn-block">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>KYC Verification Setup</h3>
+                                </div>
+                                <form method="post" action="{{ route('update-kyc-charge') }}">
+                                    @method('PUT')
+                                    @csrf
+                                    <div class="card-body">
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-exclamation-circle"></i> Provide KYC charges
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label">BVN Charges</label>
+                                                <input type="number" class="form-control" name="bvn_charges"
+                                                    value="{{ $kycSettings->bvn }}">
+                                                <input type="hidden" class="form-control form-control-lg"
+                                                    name="updateKYC" value="updateKYC" />
+                                                @error('min_value')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label">NIN Charges</label>
+                                                <input type="number" class="form-control" name="nin_charges"
+                                                    value="{{ $kycSettings->nin }}">
+                                                @error('max_value')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-md-12 mb-2">
+                                                <label class="form-label">Verification Settings</label>
+                                                <select class="form-control" name="verification_type">
+                                                    <option value="">-- Select --</option>
+                                                    <option value="disabled" <?php echo isset($kycSettings->verification_type) && $kycSettings->verification_type == "disabled" ? "selected" : ""; ?>>Disable KYC</option>
+                                                    <option value="any_bvn_or_nin" <?php echo isset($kycSettings->verification_type) && $kycSettings->verification_type == "any_bvn_or_nin" ? "selected" : ""; ?>>Allow customer to use anybody's BVN or NIN</option>
+                                                    <option value="any_bvn" <?php echo isset($kycSettings->verification_type) && $kycSettings->verification_type == "any_bvn" ? "selected" : ""; ?>>Allow customer to use anybody's BVN</option>
+                                                    <option value="any_nin" <?php echo isset($kycSettings->verification_type) && $kycSettings->verification_type == "any_nin" ? "selected" : ""; ?>>Allow customer to use anybody's NIN</option>
+                                                    <option value="use_bvn" <?php echo isset($kycSettings->verification_type) && $kycSettings->verification_type == "use_bvn" ? "selected" : ""; ?>>Allow customer to use personal BVN</option>
+                                                    <option value="use_nin" <?php echo isset($kycSettings->verification_type) && $kycSettings->verification_type == "use_nin" ? "selected" : ""; ?>>Allow customer to use personal NIN</option>
+                                                    <option value="use_bvn_or_nin" <?php echo isset($kycSettings->verification_type) && $kycSettings->verification_type == "use_bvn_or_nin" ? "selected" : ""; ?>>Allow customer to use personal BVN or NIN</option>
+                                                </select>                                                
+                                                @error('max_value')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                                <input class="form-control form-control-lg" type="hidden"
+                                                    name="updateKycSettings" />
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="card-footer">

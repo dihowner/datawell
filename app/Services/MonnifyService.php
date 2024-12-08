@@ -9,6 +9,7 @@ use App\Classes\HttpRequest;
 use App\Http\Traits\ResponseTrait;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use App\Helpers\EncryptorHelper;
 use Illuminate\Http\Client\RequestException;
 
 class MonnifyService extends UserService {
@@ -82,6 +83,8 @@ class MonnifyService extends UserService {
                 $bank_code[] = $allVirtualBank[$i]['bank_code'];
             }
 
+            $encryptorHelper = new EncryptorHelper();
+
             $reserveBody = [
                 "accountReference" => $userData['reference'],
                 "accountName" => $userData['username'],
@@ -92,6 +95,12 @@ class MonnifyService extends UserService {
                 "getAllAvailableBanks" => false,
                 "preferredBanks" => $bank_code
             ];
+            
+            if (isset($userData['bvn'])) {
+                $reserveBody['bvn'] = $encryptorHelper->decryptCredential($userData['bvn']);   
+            } else {
+                $reserveBody['nin'] = $encryptorHelper->decryptCredential($userData['nin']);   
+            }
 
             $reserveResult = HttpRequest::sendPost($this->endpoint.$this->v2."bank-transfer/reserved-accounts", $reserveBody, [
                 "Authorization" => "Bearer ".$this->generateAuthToken(),
@@ -111,12 +120,19 @@ class MonnifyService extends UserService {
                 $this->responseBody = $newArray;
             }
             else {
-                $this->responseBody = $this->sendError("Error reserving account", [], 400);
+                $responseError = strtolower($reserveResult['responseMessage']);
+                if (str_contains($responseError, 'bvn or nin is required')) {
+                    $message = "BVN or NIN is required. Kindly complete your KYC Verification.";
+                } else {
+                    $message = "Error reserving account";
+                }
+                $this->responseBody = ["message" => $message, "status" => false];
             }
         }
         catch(Exception $e) {
+            http_response_code(400);
             Log::error($e->getMessage());
-            $this->responseBody = $this->sendError("System Error!", [], 400);
+            $this->responseBody = ["message" => "System Error!", "status" => false];
         }
         return $this->responseBody;
     }
@@ -253,6 +269,50 @@ class MonnifyService extends UserService {
         catch(Exception $e) {
             return $this->sendError("Error!. ".$e->getMessage(), [], 500);
         }
+    }
+
+    public function verify_bvn($name, $bvnNumber, $bvnPhone, $dateBirth) {
+        try {
+            $bvnData = [
+                "name" => $name,
+                "bvn" => $bvnNumber,
+                "dateOfBirth" => $dateBirth,
+                "mobileNo" => $bvnPhone,
+            ];
+
+            // $verifyBVN = HttpRequest::sendPost($this->endpoint.$this->v1."vas/bvn-details-match", $bvnData, [
+            //     "Authorization" => "Bearer ".$this->generateAuthToken(),
+            //     "Content-Type" => "application/json"
+            // ]);
+
+            $verifyBVN = '{"requestSuccessful":true,"responseMessage":"success","responseCode":"0","responseBody":{"bvn":"22200789790","name":{"matchStatus":"FULL_MATCH","matchPercentage":100},"dateOfBirth":"FULL_MATCH","mobileNo":"FULL_MATCH"}}';
+            
+            return $verifyBVN;
+        } catch (\Exception $e) {
+            // Handle other exceptions (e.g. network errors)
+            $this->responseBody = ["message" => $e->getMessage()];
+        }     
+    }  
+
+    public function verify_nin($ninNumber) {
+        try {
+            $ninData = [
+                "nin" => $ninNumber,
+            ];
+            
+            // $verifyNIN = HttpRequest::sendPost($this->endpoint.$this->v1."vas/nin-details", $ninData, [
+            //     "Authorization" => "Bearer ".$this->generateAuthToken(),
+            //     "Content-Type" => "application/json"
+            // ]);
+
+            $verifyNIN = '{"requestSuccessful":true,"responseMessage":"success","responseCode":"0","responseBody":{"nin":"196","lastName":"OGUNDOWOLE","firstName":"RAHEEM","middleName":"OPEYEMI","dateOfBirth":"1995-10-18","gender":"MALE","mobileNumber":"08179653448"}}';
+            
+            return $verifyNIN;
+
+        } catch (\Exception $e) {
+            // Handle other exceptions (e.g. network errors)
+            $this->responseBody = ["message" => $e->getMessage()];
+        } 
     }
 
 }

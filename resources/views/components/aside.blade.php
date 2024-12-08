@@ -138,6 +138,7 @@
                 <li><a class="slide-item" href="{{ route('user.bank-account') }}"><span>Bank Account</span></a></li>
                 <li><a class="slide-item" href="{{ route('user.upgrade-plan-view') }}"><span>Upgrade Your
                             Plan</span></a></li>
+                <li><a class="slide-item" href="{{ route('user.kyc-view') }}"><span>KYC Verification</span></a></li>
             </ul>
         </li>
 

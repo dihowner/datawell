@@ -11,8 +11,7 @@ class WalletOut extends Model
     protected $table = "wallet_out";
     
     protected $fillable = [
-        "user_id", "description", "old_balance", 
-        "amount", "new_balance", "reference", "status"
+        "user_id", "description", "old_balance", "amount", "new_balance", "remark", "wallet_type", "reference", "status"
     ];
 
     public function user() {

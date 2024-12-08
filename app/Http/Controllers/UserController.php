@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\KYC;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\PlanService;
 use App\Services\UserService;
@@ -9,9 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Http\Requests\BankAccountRequest;
 use App\Http\Requests\PlanUpgradeRequest;
+use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\EditUserByAdminRequest;
-use App\Models\User;
-use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -32,7 +34,19 @@ class UserController extends Controller
             Alert::info("Create Your PIN", "To enjoy our numerous offer, kindly change your default transaction pin");
             return redirect()->route('user.pin-password-view');
         }
-        return view('private.dashboard', compact('userDetail'));
+
+        $use_nin = $use_bvn = true;
+
+        // Has User performed KYC ???
+        $kycData = KYC::where('user_id', Auth::id())->first();
+        if ($kycData AND $kycData->nin_status === 'verified') {
+            $use_nin = false;
+        }
+        if ($kycData AND $kycData->bvn_status === 'verified') {
+            $use_bvn = false;
+        }
+
+        return view('private.dashboard',  compact('userDetail', 'use_nin', 'use_bvn'));
     }
 
     public function GenerateUserVirtualAccount($userId = "") {
@@ -40,11 +54,10 @@ class UserController extends Controller
         $userId = $userId != "" ? $userId : Auth::id();
 
         $generateAccount = $this->userService->GenerateUserVirtualAccount($userId);
-        // return $generateAccount;
-        $responseCode = $generateAccount->getStatusCode();
+        $responseCode = $generateAccount->getStatusCode() ?? 400;
 
         $responseContent = json_decode($generateAccount->content());
-        $message = $responseContent->message;
+        $message = $responseContent->message ?? "Error occurred";
 
         if($responseCode === 200) {
             Alert::success('Success', $message)->autoClose(10000);
@@ -195,6 +208,83 @@ class UserController extends Controller
             // Close CSV file handle
             fclose($handle);
         }, 200, $headers);
+    }
+
+    public function KycView() {
+        $userDetail = $this->userService->getUserById(Auth::id());
+        
+        $kycSettings = $this->userService->getAllSettings()->kycSettings;
+        if ($kycSettings !== false) {
+            $kycSettings = json_decode($kycSettings, true);
+            if (!isset($kycSettings['verification_type'])) {
+                Alert::error('Error', 'KYC Verification is not properly configured. Notify Admin');
+                return redirect()->route('user.index');
+            } else if ($kycSettings['verification_type'] === 'disabled') {
+                Alert::error('Error', 'KYC Verification is currently disabled');
+                return redirect()->route('user.index');
+            }
+        }
+        
+        $use_nin = $use_bvn = true;
+
+        // Has User performed KYC ???
+        $kycData = KYC::where('user_id', Auth::id())->first();
+        if ($kycData AND $kycData->nin_status === 'verified') {
+            $use_nin = false;
+        }
+        if ($kycData AND $kycData->bvn_status === 'verified') {
+            $use_bvn = false;
+        }
+
+        if (!$use_nin AND !$use_bvn) {
+            Alert::error('Error', 'KYC Verification fully setup');
+            return redirect()->route('user.index');
+        } 
+
+        return view('private.kyc', compact('userDetail', 'kycSettings', 'use_nin', 'use_bvn'));
+    }
+
+    public function submitKycDetails(ProfileUpdateRequest $request) {
+        $data = $request->validated();
+        $user = Auth::user();
+        $userId = $user->id;
+        $verificationMethod = strtolower($data['verification_method']);
+        $isUserVerified = false;
+
+        // Has User performed KYC ???
+        $kycData = KYC::where('user_id', $userId)->first();
+
+        if ($kycData AND $verificationMethod == 'bvn' AND $kycData->bvn_status == 'verified') {
+            Alert::error('Error', 'BVN already verified');
+            return redirect()->route('user.kyc-view');
+        } else if ($kycData AND $verificationMethod == 'nin' AND $kycData->nin_status == 'verified') {
+            Alert::error('Error', 'NIN already verified');
+            return redirect()->route('user.kyc-view');
+        } else {
+            switch ($verificationMethod) {
+                case 'bvn':
+                    $clientName = $data['fullName'];
+                    $bvnNumber = $data['bvnNumber'];
+                    $bvnPhoneNumber = $data['bvnPhoneNumber'];
+                    $dateOfBirth = Carbon::createFromFormat('Y-m-d', $data['dateOfBirth'])->format('d-M-Y');
+    
+                    $result = $this->userService->verifyBVN($userId, $clientName, $bvnNumber, $bvnPhoneNumber, $dateOfBirth);
+                break;
+                
+                case 'nin':
+                    $clientName = $data['fullName'];
+                    $ninNumber = $data['ninNumber'];
+                    $ninPhoneNumber = $data['ninPhoneNumber'];
+                    $dateOfBirth = Carbon::createFromFormat('Y-m-d', $data['dateOfBirth'])->format('d-M-Y');
+                    
+                    $result = $this->userService->verifyNIN($userId, $clientName, $ninNumber, $ninPhoneNumber, $dateOfBirth);
+                break;
+                default:
+                    $result = false;
+            }
+            return [$verificationMethod, $userId, $result];
+
+        }
     }
 
 }

@@ -59,7 +59,17 @@
                     <li><a class="slide-item"  href="{{ route('system-settings') }}"><span>System Settings</span></a></li>
                     <li><a class="slide-item"  href="{{ route('planlist') }}"><span>Plan Management</span></a></li>
                     <li><a class="slide-item"  href="{{ route('product-list') }}"><span>Product Management</span></a></li>
+                </ul>
+            </li>
+    
+            <li class="slide mb-2">
+                <a class="side-menu__item"  data-toggle="slide" href="javascript:void">
+                    <i class="fa fa-book"></i>
+                    <span class="side-menu__label">Payments</span><i class="angle fa fa-angle-right"></i>
+                </a>
+                <ul class="slide-menu">
                     <li><a class="slide-item"  href="{{ route('payment-history') }}"><span>Payment History</span></a></li>
+                    <li><a class="slide-item"  href="{{ route('product-list') }}"><span>Product Management</span></a></li>
                 </ul>
             </li>
     

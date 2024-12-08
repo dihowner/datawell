@@ -16,6 +16,8 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'encryption_key' => env('ENCRYPTION_KEY', false),
+    'init_vector' => env('INIT_VECTOR'),
 
     /*
     |--------------------------------------------------------------------------

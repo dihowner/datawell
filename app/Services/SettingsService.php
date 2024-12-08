@@ -146,18 +146,19 @@ class SettingsService  {
                     return $this->sendError("Error updating airtime Conversion settings", [], 400);
                 break;
                 
-                case "kycCharges":
+                case "kyc":
                 
-                    $airtimeData = [
-                        "nin" => $settingsData["nin"],
-                        "bvn" => $settingsData["bvn"]
+                    $kycSettings = [
+                        "bvn" => $settingsData["bvn_charges"],
+                        "nin" => $settingsData["nin_charges"],
+                        "verification_type" => $settingsData["verification_type"]
                     ];
-                    $updatekycCharges = Settings::where('name', 'kycCharges')->update(["content" => json_encode($airtimeData)]);
+                    $updateKyc = Settings::where('name', 'kycSettings')->update(["content" => json_encode($kycSettings)]);
     
-                    if($updatekycCharges) {
-                        return $this->sendResponse("KYC Charges updated successfully", [], 200);
+                    if($updateKyc) {
+                        return $this->sendResponse("KYC settings updated successfully", [], 200);
                     }
-                    return $this->sendError("Error updating kyc charges settings", [], 400);
+                    return $this->sendError("Error updating kyc settings", [], 400);
                 break;
                 
                 case "vendingRestriction":
@@ -187,4 +188,12 @@ class SettingsService  {
             return $this->sendError("Error ".$e->getMessage(), [], 500);
         }
     }
+
+    public function getSettingsByName($keyName) {
+        $settings = Settings::where('name', $keyName)->first();
+        if ($settings) {
+            return $settings;
+        } 
+        return false;
+    }    
 }

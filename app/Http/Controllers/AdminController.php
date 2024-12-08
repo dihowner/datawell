@@ -205,12 +205,11 @@ class AdminController extends Controller
         return redirect()->back();
     }
     
-    public function updateKycCharge(SettingsRequest $request) {
-        
-        $updateAirtimeConversion = $this->settingsService->updateSettings($request->validated(), "kycCharges");
-                
-        $decodeResponse = json_decode($updateAirtimeConversion->getContent(), true);
-        if($updateAirtimeConversion->getStatusCode() == 200) {
+    public function updateKycSettings(SettingsRequest $request) {
+        $updateKyc = $this->settingsService->updateSettings($request->validated(), "kyc");
+        $decodeResponse = json_decode($updateKyc->getContent(), true);
+
+        if($updateKyc->getStatusCode() == 200) {
             Alert::success("Success", $decodeResponse['message'])->autoClose(10000);
         } else {
             Alert::error("Error", $decodeResponse['message'])->autoClose(10000);
